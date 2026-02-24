@@ -1,6 +1,6 @@
 1. **Paylaşım Yapma**
    - **API Metodu:** `POST /posts`
-   - **Açıklama:**Kullanıcının sistem üzerinde yeni bir gönderi (metin, görsel vb.) oluşturmasını sağlar. Bu işlem için kullanıcının sisteme giriş yapmış olması gerekir.
+   - **Açıklama:** Kullanıcının sistem üzerinde yeni bir gönderi (metin, görsel vb.) oluşturmasını sağlar. Bu işlem için kullanıcının sisteme giriş yapmış olması gerekir.
 
 2. **Yorum Yapma**
    - **API Metodu:** `POST /posts/{postId}/comments`
@@ -16,7 +16,7 @@
 
 5. **Paylaşım Beğenme**
    - **API Metodu:** `POST /posts/{postId}/likes`
-   - **Açıklama:**Bir kullanıcının belirli bir paylaşımı beğendiğini sisteme kaydeder. Eğer kullanıcı zaten beğenmişse, bu işlem genellikle beğeniyi geri çekmek (unlike) için de yapılandırılabilir.
+   - **Açıklama:** Bir kullanıcının belirli bir paylaşımı beğendiğini sisteme kaydeder. Eğer kullanıcı zaten beğenmişse, bu işlem genellikle beğeniyi geri çekmek (unlike) için de yapılandırılabilir.
 
 6. **Yorum Güncelleme**
    - **API Metodu:** `PUT /posts/{postId}/comments/{commentId}`
@@ -24,4 +24,4 @@
 
 7. **Yorumları Listeleme**
    - **API Metodu:** `GET/posts/{postId}/comments`
-   - **Açıklama:**Belirli bir paylaşıma yapılmış olan tüm yorumların görüntülenmesini sağlar. Genellikle tarih sırasına göre veya popülerliğe göre listeleme yapılır.
+   - **Açıklama:** Belirli bir paylaşıma yapılmış olan tüm yorumların görüntülenmesini sağlar. Genellikle tarih sırasına göre veya popülerliğe göre listeleme yapılır.
