@@ -92,4 +92,4 @@
 
 1. [Elif Gül Uyar'ın Gereksinimleri](Elif-Gül-Uyar/Elif-Gül-Uyar-Gereksinimler.md)
 2. [Efsa Nur Bölükbaş'ın Gereksinimleri](./Efsa-Nur-Bolukbas/Efsa-Nur-Bolukbas-Gereksinimler.md)
-3. [Grup Üyesi 3'ün Gereksinimleri](Grup-Uyesi-3/Grup-Uyesi-3-Gereksinimler.md)
+3. [Verda Er'in Gereksinimleri](Verda-Er/Verda-Er-Gereksinimler.md)
