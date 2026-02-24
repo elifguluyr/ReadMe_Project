@@ -91,5 +91,5 @@
 ## Gereksinim Dağılımları
 
 1. [Elif Gül Uyar'ın Gereksinimleri](Elif-Gül-Uyar/Elif-Gül-Uyar-Gereksinimler.md)
-2. [Grup Üyesi 2'nin Gereksinimleri](Grup-Uyesi-2/Grup-Uyesi-2-Gereksinimler.md)
+2. [Efsa Nur Bölükbaş'ın Gereksinimleri](./Efsa-Nur-Bolukbas/Efsa-Nur-Bolukbas-Gereksinimler.md)
 3. [Grup Üyesi 3'ün Gereksinimleri](Grup-Uyesi-3/Grup-Uyesi-3-Gereksinimler.md)
