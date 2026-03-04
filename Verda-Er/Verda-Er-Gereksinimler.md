@@ -8,7 +8,7 @@
 
 3. **Yorum Silme**
    - **API Metodu:** `DELETE /posts/{postId}/comments/{commentId}`
-   - **Açıklama:** Belirli bir paylaşıma ait olan spesifik bir yorumun silinmesini sağlar. Bu yapı, yorumun hangi ana kaynak (post) altında olduğunu doğrulamak ve hiyerarşik kontrol sağlamak için kullanılır. İşlem sadece yorumun sahibi veya yetkili moderatörler tarafından gerçekleştirilebilir.
+   - **Açıklama:** Belirli bir paylaşıma ait olan spesifik bir yorumun silinmesini sağlar. Bu yapı, yorumun hangi ana kaynak (post) altında olduğunu doğrulamak ve hiyerarşik kontrol sağlamak için kullanılır. İşlem sadece yorumun sahibi tarafından gerçekleştirilebilir.
 
 4. **Paylaşım Silme**
    - **API Metodu:** `DELETE /posts/{postId}`
