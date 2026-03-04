@@ -60,7 +60,7 @@
 
 15. **Paylaşım Yapma** (Verda Er)
    - **API Metodu:** `POST /posts`
-   - **Açıklama:**Kullanıcının sistem üzerinde yeni bir gönderi (metin, görsel vb.) oluşturmasını sağlar. Bu işlem için kullanıcının sisteme giriş yapmış olması gerekir.
+   - **Açıklama:** Kullanıcının sistem üzerinde yeni bir gönderi (metin, görsel vb.) oluşturmasını sağlar. Bu işlem için kullanıcının sisteme giriş yapmış olması gerekir.
 
 16. **Yorum Yapma** (Verda Er)
    - **API Metodu:** `POST /posts/{postId}/comments`
@@ -68,7 +68,7 @@
 
 17. **Yorum Silme** (Verda Er)
    - **API Metodu:** `DELETE /posts/{postId}/comments/{commentId}`
-   - **Açıklama:** Belirli bir paylaşıma ait olan spesifik bir yorumun silinmesini sağlar. Bu yapı, yorumun hangi ana kaynak (post) altında olduğunu doğrulamak ve hiyerarşik kontrol sağlamak için kullanılır. İşlem sadece yorumun sahibi veya yetkili moderatörler tarafından gerçekleştirilebilir.
+   - **Açıklama:** Belirli bir paylaşıma ait olan spesifik bir yorumun silinmesini sağlar. Bu yapı, yorumun hangi ana kaynak (post) altında olduğunu doğrulamak ve hiyerarşik kontrol sağlamak için kullanılır. İşlem sadece yorumun sahibi tarafından gerçekleştirilebilir.
 
 18. **Paylaşım Silme** (Verda Er)
    - **API Metodu:** `DELETE /posts/{postId}`
@@ -76,7 +76,7 @@
 
 19. **Paylaşım Beğenme** (Verda Er)
    - **API Metodu:** `POST /posts/{postId}/likes`
-   - **Açıklama:**Bir kullanıcının belirli bir paylaşımı beğendiğini sisteme kaydeder. Eğer kullanıcı zaten beğenmişse, bu işlem genellikle beğeniyi geri çekmek (unlike) için de yapılandırılabilir.
+   - **Açıklama:** Bir kullanıcının belirli bir paylaşımı beğendiğini sisteme kaydeder. Eğer kullanıcı zaten beğenmişse, bu işlem genellikle beğeniyi geri çekmek (unlike) için de yapılandırılabilir.
 
 20. **Yorum Güncelleme** (Verda Er)
    - **API Metodu:** `PUT /posts/{postId}/comments/{commentId}`
@@ -84,7 +84,7 @@
 
 21. **Yorumları Listeleme** (Verda Er)
    - **API Metodu:** `GET/posts/{postId}/comments`
-   - **Açıklama:**Belirli bir paylaşıma yapılmış olan tüm yorumların görüntülenmesini sağlar. Genellikle tarih sırasına göre veya popülerliğe göre listeleme yapılır.
+   - **Açıklama:** Belirli bir paylaşıma yapılmış olan tüm yorumların görüntülenmesini sağlar. Genellikle tarih sırasına göre veya popülerliğe göre listeleme yapılır.
 
 
 
