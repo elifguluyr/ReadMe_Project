@@ -38,7 +38,7 @@ router.post('/login', ctrlAuth.login);
 
 
 //efsanın router kısmı
-router.use("/books", bookRoutes);
+router.use("/", bookRoutes);
 router.use("/ratings", ratingRoutes);
 router.use("/shelves", shelfRoutes);
 
