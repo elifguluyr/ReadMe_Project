@@ -9,8 +9,9 @@ const ctrlAuth = require('../controllers/Auth');
 
 
 //efsanın const kısmı
-
-
+const bookRoutes = require("./bookRoutes");
+const ratingRoutes = require("./ratingRoutes");
+const shelfRoutes = require("./shelfRoutes");
 
 
 
@@ -37,9 +38,9 @@ router.post('/login', ctrlAuth.login);
 
 
 //efsanın router kısmı
-
-
-
+router.use("/", bookRoutes);
+router.use("/ratings", ratingRoutes);
+router.use("/shelves", shelfRoutes);
 
 
 
