@@ -69,6 +69,7 @@ router.post('/paylasim/:paylasimId/begen', ctrlSosyal.paylasimBegen);
 router.put('/paylasim/:paylasimId/yorum/:yorumId', ctrlSosyal.yorumGuncelle);
 
 router.get('/paylasim/:paylasimId/yorumlar', ctrlSosyal.yorumlariListele);//belirli bir paylaşımın yorumlarını listeleme
+
 router.get('/paylasim/:paylasimId', ctrlSosyal.paylasimGetir);
 
 module.exports = router;
