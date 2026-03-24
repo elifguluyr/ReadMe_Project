@@ -15,6 +15,13 @@ const signUp = async function (req, res) {
         const user = new User();
         user.name = req.body.name;
         user.email = req.body.email;
+        if (req.body.bio) {
+            user.bio = req.body.bio;
+        }
+        
+        if (req.body.profileImage) {
+            user.profileImage = req.body.profileImage;
+        }
         user.setPassword(req.body.password);
         const newUser = await user.save();
         const generatedToken = newUser.generateToken();
