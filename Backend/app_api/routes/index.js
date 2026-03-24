@@ -22,7 +22,7 @@ const shelfRoutes = require("./shelfRoutes");
 
 
 //verdanın const kısmı
-
+const ctrlSosyal = require('../controllers/sosyalController');
 
 
 
@@ -46,6 +46,30 @@ router.use("/", bookRoutes);
 router.use("/ratings", ratingRoutes);
 router.use("/shelves", shelfRoutes);
 
-module.exports = router;
+
 
 //verdanın router kısmı
+
+
+router.post('/paylasim', ctrlSosyal.paylasimYap);
+
+
+router.post('/paylasim/:paylasimId/yorum', ctrlSosyal.yorumYap);
+
+
+router.delete('/paylasim/:paylasimId/yorum/:yorumId', ctrlSosyal.yorumSil);
+
+
+router.delete('/paylasim/:paylasimId', ctrlSosyal.paylasimSil);
+
+
+router.post('/paylasim/:paylasimId/begen', ctrlSosyal.paylasimBegen);
+
+
+router.put('/paylasim/:paylasimId/yorum/:yorumId', ctrlSosyal.yorumGuncelle);
+
+router.get('/paylasim/:paylasimId/yorumlar', ctrlSosyal.yorumlariListele);//belirli bir paylaşımın yorumlarını listeleme
+
+router.get('/paylasim/:paylasimId', ctrlSosyal.paylasimGetir);
+
+module.exports = router;
