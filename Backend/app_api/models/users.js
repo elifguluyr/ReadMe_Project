@@ -11,7 +11,23 @@ const user = new mongoose.Schema({
         type:String,
         required:true,
     },
-    
+    bio: {
+        type: String,
+        maxlength: 200, 
+        default: "Yeni kitap kurdu."
+    },
+    profileImage: {
+        type: String,
+        default: "default_avatar.jpg" 
+    },
+    following: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'user' 
+    }],
+    shelf: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Shelf'
+    }],
     hash: String,
     salt: String,
     token: {
@@ -36,10 +52,9 @@ user.methods.generateToken=function(){
             _id:this._id,
             email:this.email,
             name:this.name,
-            role:this.role
     },
     process.env.JWT_SECRET || 'defaultsecret',
     { expiresIn: '1h' } // JWT süresini 1 saat yaptım
    );
 };
-mongoose.model('user',user, 'users');
+module.exports = mongoose.model('user', user, 'users');
