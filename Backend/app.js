@@ -6,6 +6,8 @@ var logger = require('morgan');
 require('./app_api/models/db');
 require('./app_api/models/users');
 require('./app_api/config/passport');
+require('./app_api/models/paylasim');
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
