@@ -1,6 +1,5 @@
 var mongoose=require('mongoose');
-//var dbURI='mongodb+srv://TrioReads:TrioReads123@cluster0.epc63ez.mongodb.net/?appName=Cluster0/ReadMeDB';
-var dbURI='mongodb://localhost/ReadMeDB';
+var dbURI='mongodb+srv://TrioReads:TrioReads123@cluster0.epc63ez.mongodb.net/?appName=Cluster0/ReadMeDB';
 mongoose.connect(dbURI);
 mongoose.connection.on('connected',function(){
     console.log(dbURI+' adresindeki veritabanına bağlanıldı.');
