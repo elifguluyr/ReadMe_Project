@@ -1,16 +1,27 @@
 const mongoose = require("mongoose");
 const Shelf = require("../models/Shelf");
+const User = require("../models/users");
 const Book = mongoose.model("Book");
 
 const createShelf = async (req, res) => {
   try {
     const { name } = req.body;
-
+    const userId = req.auth._id; 
+    if (!name) {
+      return res.status(400).json({ message: "Raf adı gereklidir" });
+    }
+    const foundUser = await User.findById(userId);
+    if (!foundUser) {
+      return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+    }
     const newShelf = new Shelf({
-      name
+      name,
+      user: userId
     });
 
     const savedShelf = await newShelf.save();
+    await User.findByIdAndUpdate(userId, { $addToSet: { shelf: savedShelf._id } }, { new: true });
+
 
     res.status(201).json(savedShelf);
   } catch (error) {
@@ -24,8 +35,13 @@ const createShelf = async (req, res) => {
 const addBookToShelf = async (req, res) => {
   const { shelfId } = req.params;
   const { googleId, title, author } = req.body;
-
+  const userId = req.auth._id;
   try {
+    const shelf = await Shelf.findById(shelfId);
+
+    if (!shelf) {
+      return res.status(404).json({ message: "Raf bulunamadı" });
+    }
     let book = await Book.findOne({ googleId });
 
     if (!book) {
@@ -38,7 +54,7 @@ const addBookToShelf = async (req, res) => {
     }
 
     const updatedShelf = await Shelf.findByIdAndUpdate(
-      shelfId,
+      { _id: shelfId , user: userId},
       { $addToSet: { books: book._id } },
       { new: true }
     );
@@ -60,10 +76,11 @@ const addBookToShelf = async (req, res) => {
 };
 const removeBookFromShelf = async (req, res) => {
   const { shelfId, bookId } = req.params;
+  const userId = req.auth._id;
 
   try {
     const updatedShelf = await Shelf.findByIdAndUpdate(
-      shelfId,
+      { _id: shelfId, user: userId },
       { $pull: { books: bookId } },
       { new: true }
     );

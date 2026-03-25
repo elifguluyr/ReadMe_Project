@@ -43,33 +43,22 @@ router.delete('/delete', auth, ctrlUser.deleteAccount);
 
 //efsanın router kısmı
 router.use("/", bookRoutes);
-router.use("/ratings", ratingRoutes);
-router.use("/shelves", shelfRoutes);
+router.use("/ratings", auth,ratingRoutes);
+router.use("/shelves", auth, shelfRoutes);
 
 
 
 //verdanın router kısmı
 
 
-router.post('/paylasim', ctrlSosyal.paylasimYap);
+router.post('/paylasim', auth, ctrlSosyal.paylasimYap);
+router.post('/paylasim/:paylasimId/yorum', auth, ctrlSosyal.yorumYap);
+router.post('/paylasim/:paylasimId/begen', auth, ctrlSosyal.begen);
+router.put('/paylasim/:paylasimId/yorum/:yorumId', auth, ctrlSosyal.yorumGuncelle);
+router.delete('/paylasim/:paylasimId/yorum/:yorumId', auth, ctrlSosyal.yorumSil);
+router.delete('/paylasim/:paylasimId', auth, ctrlSosyal.paylasimSil);
 
-
-router.post('/paylasim/:paylasimId/yorum', ctrlSosyal.yorumYap);
-
-
-router.delete('/paylasim/:paylasimId/yorum/:yorumId', ctrlSosyal.yorumSil);
-
-
-router.delete('/paylasim/:paylasimId', ctrlSosyal.paylasimSil);
-
-
-router.post('/paylasim/:paylasimId/begen', ctrlSosyal.paylasimBegen);
-
-
-router.put('/paylasim/:paylasimId/yorum/:yorumId', ctrlSosyal.yorumGuncelle);
-
-router.get('/paylasim/:paylasimId/yorumlar', ctrlSosyal.yorumlariListele);//belirli bir paylaşımın yorumlarını listeleme
-
+router.get('/paylasim/:paylasimId/yorumlar', ctrlSosyal.yorumlariListele);
 router.get('/paylasim/:paylasimId', ctrlSosyal.paylasimGetir);
 
 module.exports = router;

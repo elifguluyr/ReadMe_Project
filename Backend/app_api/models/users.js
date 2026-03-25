@@ -1,6 +1,7 @@
 var mongoose=require('mongoose');
 const crypto=require('crypto');
 const jwt = require('jsonwebtoken');
+const paylasim = require('./paylasim');
 const user = new mongoose.Schema({
     email: {
         type:String,
@@ -28,6 +29,11 @@ const user = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Shelf'
     }],
+    posts: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Paylasim'
+    }],
+    
     hash: String,
     salt: String,
     token: {

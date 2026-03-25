@@ -1,20 +1,40 @@
 const mongoose = require('mongoose');
 
-
-const yorumSema = new mongoose.Schema({
-    kullanici: { type: String, required: true }, 
-    yorumMetni: { type: String, required: true }, 
-    tarih: { type: Date, default: Date.now }
+const yorumSemasi = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+  commentText: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  }
 });
 
-
-const paylasimSema = new mongoose.Schema({
-    kullanici: { type: String, required: true },
-    paylasimMetni: { type: String, required: true }, 
-    begeniSayisi: { type: Number, default: 0 }, 
-   
-    yorumlar: [yorumSema] 
+const paylasimSemasi = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+  postText: {
+    type: String,
+    required: true
+  },
+  likes: {
+    type: Number,
+    default: 0
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  },
+  comments: [yorumSemasi]
 });
 
-
-mongoose.model('Paylasim', paylasimSema);
+module.exports = mongoose.model("Paylasim", paylasimSemasi, "paylasims");
