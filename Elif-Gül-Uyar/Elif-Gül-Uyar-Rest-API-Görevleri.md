@@ -3,7 +3,7 @@
 **API Test Videosu:** [Link buraya eklenecek](https://example.com)
 
 ## 1. Üye Olma
-- **Endpoint:** `POST /auth/signup`
+- **Endpoint:** `POST /api/signup`
 - **Request Body:** 
   ```json
   {
@@ -17,7 +17,7 @@
 - **Response:** `201 Created` - Kullanıcı başarıyla oluşturuldu
 
 ## 2. Giriş Yapma
-- **Endpoint:** `POST /auth/login`
+- **Endpoint:** `POST /api/login`
 - **Request Body:** 
   ```json
   {
@@ -28,14 +28,14 @@
 - **Response:** `200 OK` - Giriş yapıldı
 
 ## 3. Kullanıcı Bilgilerini Görüntüleme
-- **Endpoint:** `GET /users/{userId}`
+- **Endpoint:** `GET /api/users/{userId}`
 - **Path Parameters:** 
   - `userId` (string, required) - Kullanıcı ID'si
 - **Authentication:** Gerekli değil.
 - **Response:** `200 OK` - Kullanıcı bilgileri başarıyla getirildi
 
 ## 4. Kullanıcı Bilgilerini Güncelleme
-- **Endpoint:** `PUT /users/`
+- **Endpoint:** `PUT /api/users/`
 - **Request Body:** 
   ```json
   {
@@ -50,12 +50,12 @@
 - **Response:** `200 OK` - Kullanıcı başarıyla güncellendi
 
 ## 5. Kullanıcı Silme
-- **Endpoint:** `DELETE /users`
+- **Endpoint:** `DELETE /api/users`
 - **Authentication:** Bearer Token gerekli (Yönetici yetkisi veya kendi hesabını silme yetkisi)
 - **Response:** `204 No Content` - Kullanıcı başarıyla silindi
 
 ## 6. Takip Etme/Takipten Çıkma
-- **Endpoint:** `POST /users/{userId}`
+- **Endpoint:** `POST /api/users/{userId}`
 - **Path Parameters:** 
   - `userId` (string, required) - Kullanıcı ID'si
 - **Authentication:** Bearer Token gerekli
