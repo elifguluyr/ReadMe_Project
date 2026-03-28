@@ -71,9 +71,9 @@
   - `paylasimId` (string, gerekli).
 - **Response:** `200 OK` - Paylaşıma ait tüm yorumlar başarıyla getirildi.
 
-## 8. Paylaşım Getirme
-- **Endpoint:** `GET /api/paylasim/{paylasimId}`
-- **Authentication:** Herkese Açık (Public).
-- **Path Parameters:** 
-  - `paylasimId` (string, gerekli) - Görüntülenmek istenen paylaşımın benzersiz ID'si.
-- **Response:** `200 OK` - Belirli paylaşıma ait tüm detaylar başarıyla getirildi.
+## 8. Paylaşımları Listeleme
+- **Endpoint:** `GET /api/paylasim`
+- **Authentication:** Herkese Açık (Public)
+- **Path Parameters:** - Yok
+- **Response:** `200 OK` - Tüm paylaşımlar başarıyla getirildi.
+

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
@@ -171,9 +171,9 @@ const Register = () => {
 
           <div className="mt-6 text-center text-sm text-wood/60">
             Zaten bir hesabınız var mı?{' '}
-            <a href="/login" className="font-medium text-navy hover:text-sage transition-colors duration-200">
+            <Link to="/login" className="font-medium text-navy hover:text-sage transition-colors duration-200">
               Giriş Yap
-            </a>
+            </Link>
           </div>
         </div>
       </div>

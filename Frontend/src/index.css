@@ -1,6 +1,24 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+@layer utilities {
+  .animate-gradient-slow {
+    animation: gradient-bg 14s ease-in-out infinite;
+    background-size: 200% 200%;
+  }
+}
+
+@keyframes gradient-bg {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
 
 :root {
   --text: #6b6375;
@@ -56,18 +74,37 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, rgba(139,168,136,0.18), transparent 24%),
+              radial-gradient(circle at bottom right, rgba(74,93,130,0.15), transparent 20%),
+              linear-gradient(180deg, #F9F6F0 0%, #F2EFEA 100%);
+  font-family: var(--sans);
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
+  width: 100%;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(139,168,136,0.35);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(139,168,136,0.55);
 }
 
 h1,

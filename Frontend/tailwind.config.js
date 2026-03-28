@@ -6,6 +6,12 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        soft: '0 20px 60px rgba(18, 44, 84, 0.08)',
+      },
       colors: {
         'sage': '#8BA888',     // Huzurlu Adaçayı Yeşili
         'wood': '#201d1a',     // Soft Toprak Kahvesi

@@ -29,3 +29,7 @@
 8. **Paylaşım Silme**
    - **API Metodu:** `DELETE /posts/{postId}`
    - **Açıklama:** Kullanıcının paylaştığı bir gönderiyi sistemden kaldırmasını sağlar. Paylaşım silindiğinde, o paylaşıma ait yorumlar ve beğeniler de genellikle sistemden temizlenir.
+
+9. **Paylaşımları Listeleme**
+   - **API Metodu:** `GET /api/paylasim`
+   - **Açıklama:** Platformdaki tüm paylaşımları, paylaşımı yapan kullanıcıların profil bilgileriyle beraber en yeniden eskiye doğru (kronolojik sırayla) listeler. Arayüzün (Frontend) ana gönderi akışını dinamik olarak besleyen metodudur.
