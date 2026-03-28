@@ -1,6 +1,6 @@
 # Elif Gül Uyar'ın REST API Metotları
 
-**API Test Videosu:** [Link buraya eklenecek](https://example.com)
+**API Test Videosu:** [youtube video linki](https://youtu.be/ghoICiGtbU8)
 
 ## 1. Üye Olma
 - **Endpoint:** `POST /api/signup`

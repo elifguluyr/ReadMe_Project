@@ -5,7 +5,8 @@ const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.params.userid)
             .select('-hash -salt') 
-            .populate('shelf'); 
+            .populate('shelf')
+            .populate('posts'); 
         
         if (!user) return res.status(404).json({ status: "Kullanıcı bulunamadı" });
         res.status(200).json(user);
