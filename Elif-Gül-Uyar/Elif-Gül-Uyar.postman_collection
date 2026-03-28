@@ -1,0 +1,263 @@
+{
+  "info": {
+    "_postman_id": "7a480253-6a6e-4ea0-8ffc-47f47a73c42a",
+    "name": "ReadMe Project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50540069",
+    "_collection_link": "https://go.postman.co/collection/50540069-7a480253-6a6e-4ea0-8ffc-47f47a73c42a?source=collection_link"
+  },
+  "variable": [
+    {
+      "key": "ReadMe URI",
+      "value": "https://readme-api-m7pb.onrender.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "kayıt ol",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "name",
+              "value": "elif",
+              "type": "text",
+              "uuid": "752e9854-01e8-40b7-a77e-391fb228a7f2"
+            },
+            {
+              "key": "email",
+              "value": "egu@test.com",
+              "type": "text",
+              "uuid": "c22e0d9a-a031-440c-b540-0da5f6d9f6c4"
+            },
+            {
+              "key": "password",
+              "value": "12345",
+              "type": "text",
+              "uuid": "e23e3240-ce2a-4fab-86be-723c1dbba412"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{ReadMe URI}}/api/signup",
+          "host": [
+            "{{ReadMe URI}}"
+          ],
+          "path": [
+            "api",
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "giriş yap",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "email",
+              "value": "egu@test.com",
+              "type": "text",
+              "uuid": "da59ca2c-d52b-439c-b60b-ec0813000c57"
+            },
+            {
+              "key": "password",
+              "value": "12345",
+              "type": "text",
+              "uuid": "093af559-3b10-4f8b-95df-353f1955edf6"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{ReadMe URI}}/api/login",
+          "host": [
+            "{{ReadMe URI}}"
+          ],
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "kitap arama",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{ReadMe URI}}/api/books/search?q=harry",
+          "host": [
+            "{{ReadMe URI}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "harry"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "profil görüntüleme",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": []
+        },
+        "url": {
+          "raw": "{{ReadMe URI}}/api/profile/69c6daa808268de6b933bd72",
+          "host": [
+            "{{ReadMe URI}}"
+          ],
+          "path": [
+            "api",
+            "profile",
+            "69c6daa808268de6b933bd72"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "profil güncelleme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM3YjllNzRjNWIxYzA5N2UyOWQ5ZjIiLCJlbWFpbCI6ImVndUB0ZXN0LmNvbSIsIm5hbWUiOiJlbGlmIiwiaWF0IjoxNzc0Njk2OTczLCJleHAiOjE3NzQ3MDA1NzN9.oeIQFOTv3ngQ3GOwR58OsQDGIOBLmfgYSXh-HBZkQEk",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "name",
+              "value": "Elif Gül Uyar",
+              "type": "text",
+              "uuid": "b4c93913-6846-4466-8e16-8b6612f50a16"
+            },
+            {
+              "key": "email",
+              "value": "egu@test.com",
+              "type": "text",
+              "uuid": "fddeff2c-b311-42f2-a159-474d31d1df06"
+            },
+            {
+              "key": "password",
+              "value": "12345",
+              "type": "text",
+              "uuid": "4968b645-a299-482e-8d25-a8aa5d9494f1"
+            },
+            {
+              "key": "bio",
+              "value": "kitap",
+              "type": "text",
+              "uuid": "4b7da562-e3f2-4dc1-bc51-203c0898d26b"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{ReadMe URI}}/api/profile/update",
+          "host": [
+            "{{ReadMe URI}}"
+          ],
+          "path": [
+            "api",
+            "profile",
+            "update"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "takip etme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM3YjllNzRjNWIxYzA5N2UyOWQ5ZjIiLCJlbWFpbCI6ImVndUB0ZXN0LmNvbSIsIm5hbWUiOiJlbGlmIiwiaWF0IjoxNzc0Njk2OTczLCJleHAiOjE3NzQ3MDA1NzN9.oeIQFOTv3ngQ3GOwR58OsQDGIOBLmfgYSXh-HBZkQEk",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{ReadMe URI}}/api/follow/69c6daa808268de6b933bd72",
+          "host": [
+            "{{ReadMe URI}}"
+          ],
+          "path": [
+            "api",
+            "follow",
+            "69c6daa808268de6b933bd72"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Hesap silme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM3YjllNzRjNWIxYzA5N2UyOWQ5ZjIiLCJlbWFpbCI6ImVndUB0ZXN0LmNvbSIsIm5hbWUiOiJlbGlmIiwiaWF0IjoxNzc0Njk2OTczLCJleHAiOjE3NzQ3MDA1NzN9.oeIQFOTv3ngQ3GOwR58OsQDGIOBLmfgYSXh-HBZkQEk",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{ReadMe URI}}/api/delete",
+          "host": [
+            "{{ReadMe URI}}"
+          ],
+          "path": [
+            "api",
+            "delete"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

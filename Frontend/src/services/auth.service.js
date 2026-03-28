@@ -6,11 +6,10 @@ import api from '../lib/axios';
 class AuthService {
   async login(email, password) {
     const response = await api.post('/login', { email, password });
-    return response.data; // Expected: { token, user: { ... } }
+    return response.data; 
   }
 
   async register(name, email, password, bio, profileImage) {
-    // Exact mapping from Elif-Gül-Uyar-Rest-API-Görevleri.md
     const payload = { name, email, password };
     if (bio) payload.bio = bio;
     if (profileImage) payload.profileImage = profileImage;
