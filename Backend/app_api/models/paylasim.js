@@ -19,7 +19,7 @@ const yorumSemasi = new mongoose.Schema({
 const paylasimSemasi = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Model isminle aynı olmalı
+    ref: 'user', // Model isminle aynı olmalı
     required: true
   },
   postText: {
@@ -30,7 +30,7 @@ const paylasimSemasi = new mongoose.Schema({
   // 'likes' alanını sildik, çünkü likedBy.length bize sayıyı verecek.
   likedBy: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'user',
     default: []
   }],
   date: {

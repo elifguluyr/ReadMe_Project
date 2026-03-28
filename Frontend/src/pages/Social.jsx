@@ -82,7 +82,7 @@ function Social() {
               <div className="absolute inset-0 rounded-full border-4 border-sage/20"></div>
               <div className="absolute inset-0 rounded-full border-4 border-navy border-t-transparent animate-spin"></div>
             </div>
-            <p className="text-navy/60 font-medium text-sm animate-pulse">Hikayeler yükleniyor...</p>
+            <p className="text-navy/60 font-medium text-sm animate-pulse">Gönderileryükleniyor...</p>
           </div>
         ) : posts.length > 0 ? (
           <>
