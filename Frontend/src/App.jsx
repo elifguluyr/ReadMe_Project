@@ -11,7 +11,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:userId?" element={<Profile />} />
           <Route path="*" element={<Navigate to="/profile" replace />} />
         </Routes>
       </Router>
@@ -20,4 +20,3 @@ function App() {
 }
 
 export default App;
-
