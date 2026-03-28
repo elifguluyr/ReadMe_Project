@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://readme-api-m7pb.onrender.com',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       }
     }

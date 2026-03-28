@@ -1,0 +1,262 @@
+{
+  "info": {
+    "_postman_id": "a449a4d5-a935-4b8b-b3df-816728d5c053",
+    "name": "Efsa_Gereksinimler",
+    "description": "Bu koleksiyon yalnızca tarafıma ait gereksinimler içermektedir. JWT token ayrı olarak alınmış ve collection authorization kısmında kullanılmıştır.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50876500",
+    "_collection_link": "https://go.postman.co/collection/50876500-a449a4d5-a935-4b8b-b3df-816728d5c053?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "raf ekle",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM0MzYxMDAxMzVkOWQyNmJiN2ZiNmUiLCJlbWFpbCI6ImVmc2ExQHRlc3QuY29tIiwibmFtZSI6IkVmc2EiLCJpYXQiOjE3NzQ1MTc4NzAsImV4cCI6MTc3NDUyMTQ3MH0.5xzAOW-ovrFMCMU-BIA8-ZHSWMBOfs9_ffnXMwSX4-c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \n\"name\": \"Favorilerim\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/shelves",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "shelves"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "rafa kitap ekle",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM0MzYxMDAxMzVkOWQyNmJiN2ZiNmUiLCJlbWFpbCI6ImVmc2ExQHRlc3QuY29tIiwibmFtZSI6IkVmc2EiLCJpYXQiOjE3NzQ1MTc4NzAsImV4cCI6MTc3NDUyMTQ3MH0.5xzAOW-ovrFMCMU-BIA8-ZHSWMBOfs9_ffnXMwSX4-c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"googleId\": \"test123\",\n  \"title\": \"Test Book\",\n  \"author\": \"Efsa\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/shelves/69c50138658c05a7d39630ee/books",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "shelves",
+            "69c50138658c05a7d39630ee",
+            "books"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "puan ver",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM0MzYxMDAxMzVkOWQyNmJiN2ZiNmUiLCJlbWFpbCI6ImVmc2ExQHRlc3QuY29tIiwibmFtZSI6IkVmc2EiLCJpYXQiOjE3NzQ1MTc4NzAsImV4cCI6MTc3NDUyMTQ3MH0.5xzAOW-ovrFMCMU-BIA8-ZHSWMBOfs9_ffnXMwSX4-c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n \"bookId\": \"69b84c574d8d451391a95604\",\n \"rating\": 5\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/ratings",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "ratings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "puan güncelle",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM0MzYxMDAxMzVkOWQyNmJiN2ZiNmUiLCJlbWFpbCI6ImVmc2ExQHRlc3QuY29tIiwibmFtZSI6IkVmc2EiLCJpYXQiOjE3NzQ1MTc4NzAsImV4cCI6MTc3NDUyMTQ3MH0.5xzAOW-ovrFMCMU-BIA8-ZHSWMBOfs9_ffnXMwSX4-c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n \"rating\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/ratings/69c50179658c05a7d39630f6",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "ratings",
+            "69c50179658c05a7d39630f6"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "puan sil",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM0MzYxMDAxMzVkOWQyNmJiN2ZiNmUiLCJlbWFpbCI6ImVmc2ExQHRlc3QuY29tIiwibmFtZSI6IkVmc2EiLCJpYXQiOjE3NzQ1MTc4NzAsImV4cCI6MTc3NDUyMTQ3MH0.5xzAOW-ovrFMCMU-BIA8-ZHSWMBOfs9_ffnXMwSX4-c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/ratings/69c50179658c05a7d39630f6",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "ratings",
+            "69c50179658c05a7d39630f6"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "raftan kitap sil",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM0MzYxMDAxMzVkOWQyNmJiN2ZiNmUiLCJlbWFpbCI6ImVmc2ExQHRlc3QuY29tIiwibmFtZSI6IkVmc2EiLCJpYXQiOjE3NzQ1MTc4NzAsImV4cCI6MTc3NDUyMTQ3MH0.5xzAOW-ovrFMCMU-BIA8-ZHSWMBOfs9_ffnXMwSX4-c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/shelves/69c50138658c05a7d39630ee/books/69c50154658c05a7d39630f3",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "shelves",
+            "69c50138658c05a7d39630ee",
+            "books",
+            "69c50154658c05a7d39630f3"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "kitap listeleme",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/books",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "books"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Social from './pages/Social';
 import PostDetail from './pages/PostDetail';
+import Books from './pages/Books';
 
 function App() {
   return (
