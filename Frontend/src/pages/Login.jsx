@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
@@ -108,9 +108,9 @@ const Login = () => {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-navy hover:text-sage transition-colors duration-200">
+                <button type="button" className="font-medium text-navy hover:text-sage transition-colors duration-200">
                   Şifremi Unuttum
-                </a>
+                </button>
               </div>
             </div>
 
@@ -127,9 +127,9 @@ const Login = () => {
 
           <div className="mt-6 text-center text-sm text-wood/60">
             Hesabınız yok mu?{' '}
-            <a href="/register" className="font-medium text-navy hover:text-sage transition-colors duration-200">
+            <Link to="/register" className="font-medium text-navy hover:text-sage transition-colors duration-200">
               Hemen Kaydol
-            </a>
+            </Link>
           </div>
         </div>
       </div>

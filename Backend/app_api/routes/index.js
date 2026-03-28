@@ -59,6 +59,7 @@ router.delete('/paylasim/:paylasimId/yorum/:yorumId', auth, ctrlSosyal.yorumSil)
 router.delete('/paylasim/:paylasimId', auth, ctrlSosyal.paylasimSil);
 
 router.get('/paylasim/:paylasimId/yorumlar', ctrlSosyal.yorumlariListele);
-router.get('/paylasim/:paylasimId', ctrlSosyal.paylasimGetir);
+router.get('/paylasim', ctrlSosyal.paylasimlariListele);
+
 
 module.exports = router;
