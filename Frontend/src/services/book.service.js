@@ -2,7 +2,13 @@ import api from '../lib/axios';
 import axios from 'axios';
 
 class BookService {
-  
+  // Efsa'nın yazdığı genel kitapları getirme fonksiyonu
+  async getBooks() {
+    const response = await api.get('/books');
+    return response.data;
+  }
+
+  // OpenLibrary Kurtarıcı Fonksiyonun
   async _fetchFromOpenLibrary(query) {
     try {
       const olResponse = await axios.get(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=15`);
@@ -23,15 +29,16 @@ class BookService {
     }
   }
 
+  // Elif'in Yazdığı Arama Fonksiyonun 
   async searchBooks(query) {
     if (!query) return [];
     
     try {
-      // 1. ADIM: Önce bizim backend'e (Google API'ye) gitmeyi dene
+      // Ana rotaya gitmeyi dene
       const response = await api.get(`/books/search?q=${encodeURIComponent(query)}`);
       return response.data;
     } catch (error) {
-      // 2. ADIM: Eğer backend çökerse
+      // Çökerse kurtarıcıyı devreye sok
       console.warn("Backend API hata verdi. Arkadaşının OpenLibrary yedek sistemi devreye giriyor...");
       return await this._fetchFromOpenLibrary(query);
     }

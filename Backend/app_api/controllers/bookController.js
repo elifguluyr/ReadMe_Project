@@ -22,7 +22,7 @@ const searchBooks = async (req, res) => {
         );
 
         if (!response.data.items) {
-        return res.status(404).json({ message: "Aramanıza uyan bir sonuç bulunamadı." });
+            return res.status(404).json({ message: "Aramanıza uyan bir sonuç bulunamadı." });
         }
 
         const results = response.data.items.map(item => ({

@@ -79,12 +79,32 @@ const yorumSil = async (req, res) => {
 
 const begen = async (req, res) => {
     try {
-        const paylasim = await Paylasim.findByIdAndUpdate(
-            req.params.paylasimId,
-            { $inc: { likes: 1 } }, 
-            { new: true }
-        );
-        res.status(200).json(paylasim);
+        const paylasim = await Paylasim.findById(req.params.paylasimId);
+        if (!paylasim) {
+            return res.status(404).json({ mesaj: "Paylaşım bulunamadı" });
+        }
+
+        const userId = req.auth._id.toString();
+        paylasim.likedBy = paylasim.likedBy || [];
+        const likedByIds = paylasim.likedBy.map((id) => id.toString());
+        const alreadyLiked = likedByIds.includes(userId);
+
+        if (alreadyLiked) {
+            paylasim.likedBy = paylasim.likedBy.filter((id) => id.toString() !== userId);
+        } else {
+            paylasim.likedBy.push(req.auth._id);
+        }
+
+        await paylasim.save();
+        const populatedPaylasim = await paylasim
+            .populate('user', 'name email profileImage')
+            .execPopulate?.() || await paylasim.populate('user', 'name email profileImage');
+        const responsePayload = {
+            ...populatedPaylasim.toObject(),
+            likes: populatedPaylasim.likedBy.length,
+        };
+
+        res.status(200).json(responsePayload);
     } catch (hata) {
         res.status(400).json({ mesaj: "Beğenme işlemi başarısız", hata: hata.message });
     }
@@ -110,7 +130,9 @@ const yorumGuncelle = async (req, res) => {
 
 const yorumlariListele = async (req, res) => {
     try {
-        const paylasim = await Paylasim.findById(req.params.paylasimId).select('comments');
+        const paylasim = await Paylasim.findById(req.params.paylasimId)
+            .select('comments')
+            .populate('comments.user', 'name');
         if (paylasim) {
             res.status(200).json(paylasim.comments);
         } else {
@@ -123,7 +145,9 @@ const yorumlariListele = async (req, res) => {
 
 const paylasimGetir = async (req, res) => {
     try {
-        const paylasim = await Paylasim.findById(req.params.paylasimId);
+        const paylasim = await Paylasim.findById(req.params.paylasimId)
+            .populate('user', 'name email profileImage')
+            .populate('comments.user', 'name profileImage');
         if (paylasim) {
             res.status(200).json(paylasim);
         } else {
@@ -133,9 +157,27 @@ const paylasimGetir = async (req, res) => {
         res.status(400).json({ mesaj: "ID formatı geçersiz", hata: hata.message });
     }
 };
+const paylasimlariListele = async (req, res) => {
+    try {
+        console.log("Paylaşımları listeleme isteği geldi..."); // Terminale bakmak için
+        const paylasimlar = await Paylasim.find()
+            .populate('user', 'name email profileImage')
+            .populate('comments.user', 'name')
+            .sort({ date: -1 });
+
+        if (!paylasimlar || paylasimlar.length === 0) {
+            return res.status(200).json({ mesaj: "Henüz hiç paylaşım yapılmamış.", veri: [] });
+        }
+
+        res.status(200).json(paylasimlar);
+    } catch (hata) {
+        console.error("Hata Detayı:", hata); // Hatayı terminalde gör
+        res.status(400).json({ mesaj: "Paylaşımlar listelenirken hata oluştu", hata: hata.message });
+    }
+};
 
 
-module.exports = { paylasimYap, yorumYap, paylasimSil, yorumSil,begen, yorumGuncelle, yorumlariListele, paylasimGetir };
+module.exports = { paylasimYap, yorumYap, paylasimSil, yorumSil, begen, yorumGuncelle, yorumlariListele, paylasimGetir, paylasimlariListele };
 
 
 

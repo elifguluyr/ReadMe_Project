@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const yorumSemasi = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "user",
     required: true
   },
   commentText: {
@@ -19,17 +19,20 @@ const yorumSemasi = new mongoose.Schema({
 const paylasimSemasi = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User', // Model isminle aynı olmalı
     required: true
   },
   postText: {
     type: String,
-    required: true
+    required: true,
+    trim: true // Başındaki ve sonundaki boşlukları otomatik siler
   },
-  likes: {
-    type: Number,
-    default: 0
-  },
+  // 'likes' alanını sildik, çünkü likedBy.length bize sayıyı verecek.
+  likedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: []
+  }],
   date: {
     type: Date,
     default: Date.now
