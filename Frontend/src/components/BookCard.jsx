@@ -23,6 +23,7 @@ const BookCard = ({ book, onRemove }) => {
       {/* Kırmızı Çarpı İkonu - Alternatif Silme Butonu */}
       {onRemove && (
         <button 
+          type="button"
           onClick={handleRemoveClick}
           disabled={removing}
           className="absolute top-4 right-4 z-10 bg-white/50 backdrop-blur-sm p-1 rounded-full text-wood/60 hover:text-red-600 hover:bg-white transition-all disabled:opacity-50"
@@ -80,16 +81,9 @@ const BookCard = ({ book, onRemove }) => {
         </div>
 
         {/* Action Button: Remove or Add depending on context */}
-        {onRemove ? (
+        {!onRemove && (
           <button
-            onClick={handleRemoveClick}
-            disabled={removing}
-            className="w-full flex justify-center items-center py-2 px-4 border border-red-200 rounded-xl shadow-sm text-sm font-bold text-red-500 bg-red-50 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 transition-all duration-300 disabled:opacity-50"
-          >
-            {removing ? 'Siliniyor...' : 'Raftan Çıkar'}
-          </button>
-        ) : (
-          <button
+            type="button"
             onClick={() => setIsShelfModalOpen(true)}
             className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-sage hover:bg-navy focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sage transition-all duration-300"
           >

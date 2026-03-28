@@ -74,20 +74,15 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
-  background: radial-gradient(circle at top left, rgba(139,168,136,0.18), transparent 24%),
-              radial-gradient(circle at bottom right, rgba(74,93,130,0.15), transparent 20%),
-              linear-gradient(180deg, #F9F6F0 0%, #F2EFEA 100%);
-  font-family: var(--sans);
-/* TailwindCSS takes over the styling. Custom dark mode and fixed widths removed to allow full screen layouts. */
-
-body {
-  margin: 0;
   padding: 0;
   width: 100vw;
   min-height: 100vh;
   overflow-x: hidden;
+  background: radial-gradient(circle at top left, rgba(139,168,136,0.18), transparent 24%),
+              radial-gradient(circle at bottom right, rgba(74,93,130,0.15), transparent 20%),
+              linear-gradient(180deg, #F9F6F0 0%, #F2EFEA 100%);
   background-color: #f7f1e3; /* Cream background matching custom Tailwind config */
+  font-family: var(--sans);
 }
 
 #root {
@@ -121,8 +116,5 @@ h2 {
   font-family: var(--heading);
   font-weight: 500;
   color: var(--text-h);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 

@@ -49,11 +49,9 @@ const Books = () => {
 
   const handleRemoveBook = async (shelfId, bookId) => {
     try {
-      if (window.confirm("Bu kitabı raftan silmek istediğinize emin misiniz?")) {
-        await shelfService.removeBookFromShelf(shelfId, bookId);
-        // Refresh the page data after successful deletion
-        fetchData();
-      }
+      await shelfService.removeBookFromShelf(shelfId, bookId);
+      // Refresh the page data after successful deletion
+      fetchData();
     } catch (err) {
       console.error('Kitap silinirken hata oluştu:', err);
       alert('Kitap silinirken bir hata oluştu.');

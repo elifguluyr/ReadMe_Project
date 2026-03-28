@@ -30,7 +30,8 @@ const ShelfModal = ({ isOpen, onClose, book }) => {
       const bookData = {
         googleId: book.googleId || book._id || 'unknown_id',
         title: book.title || 'İsimsiz Kitap',
-        author: book.author || 'Bilinmeyen Yazar'
+        author: book.author || 'Bilinmeyen Yazar',
+        imageLinks: book.imageLinks || null
       };
 
       await shelfService.addBookToShelf(newShelfId, bookData);

@@ -14,6 +14,9 @@ const BookSchema = new mongoose.Schema({
   },
   publishedYear: {
     type: Number
+  },
+  imageLinks: {
+    thumbnail: String
   }
 });
 

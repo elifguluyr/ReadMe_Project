@@ -34,7 +34,7 @@ const createShelf = async (req, res) => {
 
 const addBookToShelf = async (req, res) => {
   const { shelfId } = req.params;
-  const { googleId, title, author } = req.body;
+  const { googleId, title, author, imageLinks } = req.body;
   const userId = req.auth._id;
   try {
     const shelf = await Shelf.findById(shelfId);
@@ -48,8 +48,12 @@ const addBookToShelf = async (req, res) => {
       book = new Book({
         googleId,
         title,
-        author
+        author,
+        imageLinks
       });
+      await book.save();
+    } else if (!book.imageLinks?.thumbnail && imageLinks?.thumbnail) {
+      book.imageLinks = imageLinks;
       await book.save();
     }
 

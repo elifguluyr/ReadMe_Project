@@ -6,6 +6,7 @@ import Profile from './pages/Profile';
 import Social from './pages/Social';
 import PostDetail from './pages/PostDetail';
 import Books from './pages/Books';
+import Home from './pages/Home';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
                 ReadMe
               </Link>
               <nav className="flex flex-wrap gap-3 text-sm text-wood/70">
+                <Link to="/home" className="rounded-full px-4 py-2 hover:bg-sage/15 hover:text-navy transition-colors">Home</Link>
                 <Link to="/social" className="rounded-full px-4 py-2 hover:bg-sage/15 hover:text-navy transition-colors">Akış</Link>
                 <Link to="/profile" className="rounded-full px-4 py-2 hover:bg-sage/15 hover:text-navy transition-colors">Profil</Link>
                 <Link to="/login" className="rounded-full px-4 py-2 hover:bg-sage/15 hover:text-navy transition-colors">Giriş</Link>
@@ -30,9 +32,11 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/social" element={<Social />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/books" element={<Books />} />
             <Route path="/post/:id" element={<PostDetail />} />
-            <Route path="/" element={<Navigate to="/social" replace />} />
-            <Route path="*" element={<Navigate to="/social" replace />} />
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </Router>
       </div>
