@@ -3,9 +3,9 @@ import { useAuth } from '../../context/AuthContext';
 import postService from '../../services/postService';
 
 const CommentItem = ({ comment, postId, onDeleteComment, onUpdateComment, currentUser }) => {
-  const commentAuthor = comment.user && typeof comment.user === 'object'
-    ? comment.user
-    : (comment.user === currentUser?.id || comment.user === currentUser?._id ? currentUser : null);
+  const commentAuthor = typeof comment.user === 'object' ? comment.user : (
+    (comment.user === currentUser?.id || comment.user === currentUser?._id) ? currentUser : null
+  );
   const isOwner = commentAuthor && currentUser && (commentAuthor._id || commentAuthor.id) === currentUser.id;
   const authorName = commentAuthor?.name || 'Kullanıcı';
   const authorInitial = commentAuthor?.name ? commentAuthor.name.charAt(0).toUpperCase() : 'C';
@@ -85,7 +85,9 @@ function PostCard({ post, onDeletePost, onUpdatePost }) {
   const [localLikes, setLocalLikes] = useState(typeof post.likes === 'number' ? post.likes : (Array.isArray(post.likedBy) ? post.likedBy.length : 0));
 
   const currentUserId = user?.id || user?._id;
-  const author = typeof post.user === 'object' ? post.user : (post.user === currentUserId ? user : null);
+  const author = typeof post.user === 'object' ? post.user : (
+    (post.user === currentUserId || post.user === user?._id) ? user : null
+  );
   const authorName = author?.name || 'Bilinmeyen Kullanıcı';
   const authorInitial = author?.name ? author.name.charAt(0).toUpperCase() : 'U';
   const postDate = new Date(post.date || post.createdAt);
@@ -100,6 +102,19 @@ function PostCard({ post, onDeletePost, onUpdatePost }) {
     if (likeLoading) return;
 
     setLikeLoading(true);
+
+   
+    const previousLikedBy = [...localLikedBy];
+    const previousLikes = localLikes;
+
+    if (isLiked) {
+      setLocalLikedBy(localLikedBy.filter((likeUser) => (likeUser?._id || likeUser)?.toString() !== currentUserId?.toString()));
+      setLocalLikes(Math.max(0, localLikes - 1));
+    } else {
+      setLocalLikedBy([...localLikedBy, user]);
+      setLocalLikes(localLikes + 1);
+    }
+
     try {
       const updated = await postService.toggleLike(post._id);
       const updatedLikedBy = Array.isArray(updated.likedBy) ? updated.likedBy : [];
@@ -122,7 +137,9 @@ function PostCard({ post, onDeletePost, onUpdatePost }) {
       }
     } catch (error) {
       console.error('Like error:', error);
-      alert('Beğeni güncellenirken bir hata oluştu. Lütfen tekrar deneyin.');
+    
+      setLocalLikedBy(previousLikedBy);
+      setLocalLikes(previousLikes);
     } finally {
       setLikeLoading(false);
     }
@@ -238,7 +255,7 @@ function PostCard({ post, onDeletePost, onUpdatePost }) {
         <button 
           onClick={handleLike} 
           disabled={likeLoading}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${isLiked ? 'text-[#ff4b4b] bg-red-50' : 'text-wood/60 hover:text-[#ff4b4b] hover:bg-red-50 hover:scale-105 active:scale-95'} ${likeLoading ? 'cursor-not-allowed opacity-70' : ''}`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${isLiked ? 'text-[#ff4b4b] bg-red-50' : 'text-wood/60 hover:text-[#ff4b4b] hover:bg-red-50 hover:scale-105 active:scale-95'}`}
           title={isLiked ? 'Beğeniyi kaldır' : 'Beğen'}
         >
           <svg className={`w-5 h-5 transition-transform ${isLiked ? 'scale-110' : ''}`} fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">

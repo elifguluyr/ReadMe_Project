@@ -97,8 +97,8 @@ const begen = async (req, res) => {
 
         await paylasim.save();
         const populatedPaylasim = await paylasim
-            .populate('user', 'name email profileImage')
-            .execPopulate?.() || await paylasim.populate('user', 'name email profileImage');
+            .populate({ path: 'user', model: 'user', select: 'name email profileImage' })
+            .execPopulate?.() || await paylasim.populate({ path: 'user', model: 'user', select: 'name email profileImage' });
         const responsePayload = {
             ...populatedPaylasim.toObject(),
             likes: populatedPaylasim.likedBy.length,
@@ -132,7 +132,7 @@ const yorumlariListele = async (req, res) => {
     try {
         const paylasim = await Paylasim.findById(req.params.paylasimId)
             .select('comments')
-            .populate('comments.user', 'name');
+            .populate({ path: 'comments.user', model: 'user', select: 'name' });
         if (paylasim) {
             res.status(200).json(paylasim.comments);
         } else {
@@ -146,8 +146,8 @@ const yorumlariListele = async (req, res) => {
 const paylasimGetir = async (req, res) => {
     try {
         const paylasim = await Paylasim.findById(req.params.paylasimId)
-            .populate('user', 'name email profileImage')
-            .populate('comments.user', 'name profileImage');
+            .populate({ path: 'user', model: 'user', select: 'name email profileImage' })
+            .populate({ path: 'comments.user', model: 'user', select: 'name profileImage' });
         if (paylasim) {
             res.status(200).json(paylasim);
         } else {
@@ -161,8 +161,8 @@ const paylasimlariListele = async (req, res) => {
     try {
         console.log("Paylaşımları listeleme isteği geldi..."); // Terminale bakmak için
         const paylasimlar = await Paylasim.find()
-            .populate('user', 'name email profileImage')
-            .populate('comments.user', 'name')
+            .populate({ path: 'user', model: 'user', select: 'name email profileImage' })
+            .populate({ path: 'comments.user', model: 'user', select: 'name' })
             .sort({ date: -1 });
 
         if (!paylasimlar || paylasimlar.length === 0) {

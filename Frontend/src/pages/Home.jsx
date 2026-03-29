@@ -1,10 +1,44 @@
 import { useState, useEffect } from 'react';
 import bookService from '../services/book.service';
+import { useAuth } from '../context/AuthContext';
+import postService from '../services/postService';
+import CreatePost from '../components1/social/CreatePost';
+import PostCard from '../components1/social/PostCard';
+
 
 const Home = () => {
+  const { user } = useAuth();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorInfo, setErrorInfo] = useState('');
+
+  const [posts, setPosts] = useState([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+
+  const scrollbarStyles = `
+  .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #f8f6f0; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d8d1; border-radius: 20px; }
+`;
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoadingPosts(true);
+      try {
+        const data = await postService.getPosts();
+        setPosts(data || []);
+      } catch (error) {
+        console.error('Paylaşımlar çekilemedi:', error);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+  const handlePostCreated = (newPost) => setPosts((prev) => [newPost, ...prev]);
+  const handlePostDeleted = (deletedId) => setPosts((prev) => prev.filter(p => p._id !== deletedId));
+  const handlePostUpdated = (updatedPost) => setPosts((prev) => prev.map(p => p._id === updatedPost._id ? updatedPost : p));
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -37,7 +71,7 @@ const Home = () => {
     // Ana konteyner: H-screen ile eğer App.jsx de header varsa ona göre yüksekliğini ayarlar. 
     // Sayfa içinde kaymayı engellemek için ana hatlar sticky/overflow-auto.
     <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-[#f8f6f0] font-sans">
-      
+      <style>{scrollbarStyles}</style>
       {/* 1) SOL TARAF: NAVBAR (ELİF'İN ALANI) - Placeholder */}
       <aside className="w-[240px] bg-[#f0ebd8] border-r border-[#e3dac1] flex flex-col pt-8 pb-4 px-6 shadow-sm z-20 shrink-0">
         <div className="mb-10 pl-2">
@@ -99,35 +133,43 @@ const Home = () => {
           </header>
 
           {/* ORTA ALAN: SOSYAL (VERDA'NIN ALANI) */}
-          <div className="flex-1 overflow-y-auto px-10 py-10 scrollbar-hide">
-            <div className="mb-10">
-              <span className="text-xs font-bold text-wood/50 uppercase tracking-widest">[ Verda'nın Alanı - Geniş Akış ]</span>
-              <h1 className="text-3xl font-extrabold text-navy mt-2">Sosyal Akış</h1>
-            </div>
+         <div className="flex-1 overflow-y-auto px-10 pt-5 pb-10 custom-scrollbar">
+            <div className="mb-6">
+               {/* Siyah ve net başlık */}
+               <h1 
+                   style={{ color: '#000000', opacity: '1', fontWeight: '900' }} 
+                      className="text-3xl tracking-tight"
+                >
+                       Sosyal Akış
+                </h1>
+             </div>
             
-            {/* Feed Placeholders */}
-            <div className="max-w-3xl space-y-10">
-              {[1, 2, 3].map((val) => (
-                <div key={val} className="bg-white/80 p-6 rounded-3xl border border-sage/20 shadow-lg shadow-navy/5">
-                  <div className="flex items-center gap-4 mb-5">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sage to-navy/80 flex items-center justify-center shadow-md">
-                      <span className="text-white font-bold font-serif text-xl">U</span>
-                    </div>
-                    <div>
-                      <div className="h-4 w-32 bg-wood/20 rounded-full mb-2"></div>
-                      <div className="h-3 w-20 bg-sage/30 rounded-full"></div>
-                    </div>
-                  </div>
-                  <div className="space-y-3 mb-6">
-                    <div className="h-4 w-full bg-sage/10 rounded-full"></div>
-                    <div className="h-4 w-[85%] bg-sage/10 rounded-full"></div>
-                    <div className="h-4 w-[60%] bg-sage/10 rounded-full"></div>
-                  </div>
-                  <div className="w-full h-[220px] bg-gradient-to-br from-cream to-sage/20 rounded-2xl flex items-center justify-center border-2 border-sage/20 border-dashed">
-                    <span className="text-wood/50 font-bold tracking-wide">Post Görsel / Kart Taslağı</span>
-                  </div>
+            {/* Canlı Feed Alanı (Verda) */}
+            <div className="w-full max-w-2xl mx-auto">
+              <CreatePost onPostCreated={handlePostCreated} />
+
+              {loadingPosts && posts.length === 0 ? (
+                <div className="flex flex-col justify-center items-center py-10 gap-3">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-navy"></div>
+                  <p className="text-navy/60 font-medium text-sm">Akış yükleniyor...</p>
                 </div>
-              ))}
+              ) : posts.length > 0 ? (
+                <div className="flex flex-col gap-2 mt-4">
+                  {posts.map((post) => (
+                    <PostCard 
+                      key={post._id} 
+                      post={post} 
+                      onDeletePost={handlePostDeleted} 
+                      onUpdatePost={handlePostUpdated}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16 bg-white rounded-3xl shadow-sm border border-sage/20 mt-8">
+                  <h3 className="text-xl font-semibold text-navy mb-2">Akış Şimdilik Sessiz</h3>
+                  <p className="text-wood/60 max-w-sm mx-auto">Sana gösterecek bir paylaşım yok. İlk adımı sen at!</p>
+                </div>
+              )}
             </div>
           </div>
         </main>
@@ -139,14 +181,20 @@ const Home = () => {
           <div className="absolute inset-0 bg-wood/5 pointer-events-none"></div>
 
           {/* Üst Kısım İsimlik */}
-          <div className="relative z-10 px-8 pt-8 pb-5 flex flex-col items-center border-b-[2px] border-sage/20 bg-cream/80 shadow-sm backdrop-blur-lg">
-            <span className="text-wood/70 text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-90">[ Ziyaret Ettiğin ]</span>
-            <div className="bg-gradient-to-br from-wood/10 to-sage/10 px-10 py-2 rounded-xl border border-wood/20 shadow-md">
-              <h2 className="text-2xl font-serif font-black text-navy uppercase tracking-[0.2em] drop-shadow-sm">
-                Kütüphane
+        <div className="relative z-10 px-8 pt-8 pb-5 flex flex-col items-center border-b-[2px] border-sage/20 bg-cream/80 shadow-sm backdrop-blur-lg">
+            <span className="text-wood/70 text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-90">
+                 [ Ziyaret Ettiğin ]
+             </span>
+          <div className="bg-gradient-to-br from-wood/10 to-sage/10 px-10 py-2 rounded-xl border border-wood/20 shadow-md">
+                {/* Yazıyı tam siyah ve opak yaptık */}
+             <h2 
+                style={{ color: '#000000', opacity: 1 }} 
+                 className="text-2xl font-serif font-black uppercase tracking-[0.2em] drop-shadow-sm"
+              >
+                  Kütüphane
               </h2>
-            </div>
-          </div>
+           </div>
+        </div>
 
           {/* Hata ve Ham Veri Ayıklama Alanı (Görünmezse Diye Sabit Siyah Çerçeve) */}
           {errorInfo && (

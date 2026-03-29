@@ -48,10 +48,13 @@ function Social() {
       <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-navy/5 blur-[120px] pointer-events-none"></div>
       
       {/* Ana Header Alanı - Cam (Glassmorphism) Efektli */}
-      <div className="bg-white/75 backdrop-blur-xl border-b border-sage/10 py-3.5 px-5 flex justify-between items-center sticky top-0 z-50 shadow-[0_4px_30px_rgba(0,0,0,0.03)] transition-all">
-        <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-navy via-[#3a4a6b] to-sage bg-clip-text text-transparent tracking-tight">
-          Gönderi Akışı
-        </h2>
+     <div className="sticky top-0 z-[100] bg-white border-b border-gray-200 py-4 px-6 flex justify-between items-center shadow-md">
+           <h2 
+              style={{ color: '#000000', opacity: 1, visibility: 'visible' }} 
+            className="text-xl sm:text-2xl font-extrabold tracking-tight"
+            >
+               Gönderi Akışı
+            </h2>
         <div className="flex items-center gap-3">
             {!user ? (
                <button 
@@ -103,7 +106,7 @@ function Social() {
             </div>
           </>
         ) : (
-          <div className="text-center py-24 bg-white/60 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-sage/20 mt-8">
+          <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-sage/20 mt-8">
             <div className="w-20 h-20 mx-auto bg-sage/10 rounded-full flex items-center justify-center mb-4">
               <svg className="w-10 h-10 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
