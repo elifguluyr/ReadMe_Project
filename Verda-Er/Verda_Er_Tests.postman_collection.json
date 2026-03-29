@@ -1,0 +1,279 @@
+{
+  "info": {
+    "_postman_id": "b642d50b-b377-4061-a845-0681ae847dfc",
+    "name": "ReadMe_Verda_Er",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50521409",
+    "_collection_link": "https://go.postman.co/collection/50521409-b642d50b-b377-4061-a845-0681ae847dfc?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "paylasim_yapma",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM4NGZiYmMxNjRmNzBmZjdjOGU4NjAiLCJlbWFpbCI6InZlcmRhQDJkZW5lbWUuY29tIiwibmFtZSI6IlZlcmRhIiwiaWF0IjoxNzc0NzM1MzMzLCJleHAiOjE3NzQ3Mzg5MzN9.Zj4I5zdZaEGBfaLAGcF49wFyA8fp6yY0iYxfufbilCM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"postText\": \"paylaşım \"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/paylasim",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "paylasim"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "paylasim_begen",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM4NGZiYmMxNjRmNzBmZjdjOGU4NjAiLCJlbWFpbCI6InZlcmRhQDJkZW5lbWUuY29tIiwibmFtZSI6IlZlcmRhIiwiaWF0IjoxNzc0NzM1MzMzLCJleHAiOjE3NzQ3Mzg5MzN9.Zj4I5zdZaEGBfaLAGcF49wFyA8fp6yY0iYxfufbilCM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/paylasim/69c79f894da9b48a45a94b9c/begen",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "paylasim",
+            "69c79f894da9b48a45a94b9c",
+            "begen"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "yorum_yapma",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM4NGZiYmMxNjRmNzBmZjdjOGU4NjAiLCJlbWFpbCI6InZlcmRhQDJkZW5lbWUuY29tIiwibmFtZSI6IlZlcmRhIiwiaWF0IjoxNzc0NzM1MzMzLCJleHAiOjE3NzQ3Mzg5MzN9.Zj4I5zdZaEGBfaLAGcF49wFyA8fp6yY0iYxfufbilCM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"commentText\": \"bu çok güzel\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/paylasim/69c79f894da9b48a45a94b9c/yorum",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "paylasim",
+            "69c79f894da9b48a45a94b9c",
+            "yorum"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "yorumlari_listele",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/paylasim/69c79f894da9b48a45a94b9c/yorumlar",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "paylasim",
+            "69c79f894da9b48a45a94b9c",
+            "yorumlar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "paylasimlari_listele",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/paylasim",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "paylasim"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "yorum_guncelle",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM4NGZiYmMxNjRmNzBmZjdjOGU4NjAiLCJlbWFpbCI6InZlcmRhQDJkZW5lbWUuY29tIiwibmFtZSI6IlZlcmRhIiwiaWF0IjoxNzc0NzM1MzMzLCJleHAiOjE3NzQ3Mzg5MzN9.Zj4I5zdZaEGBfaLAGcF49wFyA8fp6yY0iYxfufbilCM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"commentText\":\"güncellendi \"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/paylasim/69c558e8565d098959ce9cf2/yorum/69c55e5c565d098959ce9d3a",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "paylasim",
+            "69c558e8565d098959ce9cf2",
+            "yorum",
+            "69c55e5c565d098959ce9d3a"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "yorum_silme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM4NGZiYmMxNjRmNzBmZjdjOGU4NjAiLCJlbWFpbCI6InZlcmRhQDJkZW5lbWUuY29tIiwibmFtZSI6IlZlcmRhIiwiaWF0IjoxNzc0NzM1MzMzLCJleHAiOjE3NzQ3Mzg5MzN9.Zj4I5zdZaEGBfaLAGcF49wFyA8fp6yY0iYxfufbilCM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/paylasim/69c558e8565d098959ce9cf2/yorum/69c55e5c565d098959ce9d3a",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "paylasim",
+            "69c558e8565d098959ce9cf2",
+            "yorum",
+            "69c55e5c565d098959ce9d3a"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "paylasim_silme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM4NGZiYmMxNjRmNzBmZjdjOGU4NjAiLCJlbWFpbCI6InZlcmRhQDJkZW5lbWUuY29tIiwibmFtZSI6IlZlcmRhIiwiaWF0IjoxNzc0NzM1MzMzLCJleHAiOjE3NzQ3Mzg5MzN9.Zj4I5zdZaEGBfaLAGcF49wFyA8fp6yY0iYxfufbilCM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://readme-api-m7pb.onrender.com/api/paylasim/69c558e8565d098959ce9cf2",
+          "protocol": "https",
+          "host": [
+            "readme-api-m7pb",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "paylasim",
+            "69c558e8565d098959ce9cf2"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

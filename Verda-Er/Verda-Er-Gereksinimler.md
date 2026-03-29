@@ -18,10 +18,9 @@
    - **API Metodu:** `GET/posts/{postId}/comments`
    - **Açıklama:** Belirli bir paylaşıma yapılmış olan tüm yorumların görüntülenmesini sağlar. Genellikle tarih sırasına göre veya popülerliğe göre listeleme yapılır.
 
-6. **Paylaşım Getirme**
-   - **API Metodu:** `GET/posts/{postId}`
-   - **Açıklama:** Belirli bir benzersiz kimliğe (paylasimId) sahip olan paylaşımı ve paylaşımın tüm detaylarının tekil olarak getirilmesini sağlar.
-   
+6. **Paylaşımları Listeleme**
+   - **API Metodu:** `GET /api/paylasim`
+   - **Açıklama:** Platformdaki tüm paylaşımları, paylaşımı yapan kullanıcıların profil bilgileriyle beraber en yeniden eskiye doğru (kronolojik sırayla) listeler. Arayüzün (Frontend) ana gönderi akışını dinamik olarak besleyen metodudur.
 7. **Yorum Silme**
    - **API Metodu:** `DELETE /posts/{postId}/comments/{commentId}`
    - **Açıklama:** Belirli bir paylaşıma ait olan spesifik bir yorumun silinmesini sağlar. Bu yapı, yorumun hangi ana kaynak (post) altında olduğunu doğrulamak ve hiyerarşik kontrol sağlamak için kullanılır. İşlem sadece yorumun sahibi tarafından gerçekleştirilebilir.
@@ -29,7 +28,3 @@
 8. **Paylaşım Silme**
    - **API Metodu:** `DELETE /posts/{postId}`
    - **Açıklama:** Kullanıcının paylaştığı bir gönderiyi sistemden kaldırmasını sağlar. Paylaşım silindiğinde, o paylaşıma ait yorumlar ve beğeniler de genellikle sistemden temizlenir.
-
-9. **Paylaşımları Listeleme**
-   - **API Metodu:** `GET /api/paylasim`
-   - **Açıklama:** Platformdaki tüm paylaşımları, paylaşımı yapan kullanıcıların profil bilgileriyle beraber en yeniden eskiye doğru (kronolojik sırayla) listeler. Arayüzün (Frontend) ana gönderi akışını dinamik olarak besleyen metodudur.
