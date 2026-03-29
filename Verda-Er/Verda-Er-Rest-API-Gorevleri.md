@@ -1,6 +1,6 @@
 # Verda Er'in REST API Metotları
 
-**API Test Videosu:** (https://youtu.be/78RfyitGhr0)
+**API Test Videosu:** (https://www.youtube.com/watch?v=ujTSYITQuuY)
 
 ## 1. Paylaşım Yapma
 - **Endpoint:** `POST /api/paylasim`
