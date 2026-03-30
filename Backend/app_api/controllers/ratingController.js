@@ -81,8 +81,22 @@ const deleteRating = async (req, res) => {
   }
 };
 
+const getUserRatings = async (req, res) => {
+  try {
+    const userId = req.auth._id;
+    const ratings = await Rating.find({ user: userId });
+    res.status(200).json(ratings);
+  } catch (error) {
+    res.status(500).json({
+      message: "Puanlar getirilemedi",
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   addRating,
   updateRating,
-  deleteRating
+  deleteRating,
+  getUserRatings
 };

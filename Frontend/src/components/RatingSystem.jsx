@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ratingService from '../services/rating.service';
 
 const RatingSystem = ({ bookId, initialRatingObj = null }) => {
@@ -7,6 +7,11 @@ const RatingSystem = ({ bookId, initialRatingObj = null }) => {
   const [ratingId, setRatingId] = useState(initialRatingObj?._id || null);
   const [hover, setHover] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setRating(initialRatingObj?.rating || 0);
+    setRatingId(initialRatingObj?._id || null);
+  }, [initialRatingObj]);
 
   const handleRating = async (newRating) => {
     if (loading) return;

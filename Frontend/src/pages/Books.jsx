@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import userService from '../services/user.service';
 import bookService from '../services/book.service';
 import shelfService from '../services/shelf.service';
+import ratingService from '../services/rating.service';
 import BookCard from '../components/BookCard';
 import CreateShelfModal from '../components/CreateShelfModal';
 import AddBookModal from '../components/AddBookModal';
@@ -25,7 +26,7 @@ const Books = () => {
       // 1. Profil bilgisini ve Rafları Getir
       const profileResponse = await userService.getUserProfile(user.id);
       const userData = profileResponse.user || profileResponse.data || profileResponse;
-      
+
       const userShelves = userData.shelf || [];
       setShelves(userShelves);
 
@@ -33,9 +34,24 @@ const Books = () => {
       const allBooksResponse = await bookService.getBooks();
       const allBooksArray = Array.isArray(allBooksResponse) ? allBooksResponse : allBooksResponse.books || [];
       
+      // 3. Kullanıcının puanlarını çek
+      let userRatings = [];
+      try {
+        const ratingsData = await ratingService.getUserRatings();
+        userRatings = Array.isArray(ratingsData) ? ratingsData : ratingsData.data || [];
+      } catch (e) {
+        console.warn('Puanlar çekilemedi', e);
+      }
+      
       const dict = {};
       allBooksArray.forEach(b => {
-        if (b._id) dict[b._id] = b;
+        if (b._id) {
+          const matchingRating = userRatings.find(r => r.bookId === b._id || r.bookId?._id === b._id);
+          if (matchingRating) {
+             b.userRating = matchingRating;
+          }
+          dict[b._id] = b;
+        }
       });
       setBooksDict(dict);
 
@@ -80,7 +96,7 @@ const Books = () => {
       <div className="max-w-7xl mx-auto relative">
         {/* Çıkış Yap Butonu */}
         <div className="absolute top-0 right-0 z-20">
-          <button 
+          <button
             onClick={handleLogout}
             className="px-5 py-2.5 bg-white/50 backdrop-blur-md text-wood/90 font-bold tracking-wide rounded-full border border-wood/20 hover:bg-wood hover:text-cream transition-all duration-300 shadow-sm flex items-center gap-2 group"
           >
@@ -125,7 +141,7 @@ const Books = () => {
             {shelves.length > 0 ? (
               shelves.map((shelf) => (
                 <div key={shelf._id} className="relative bg-white/60 backdrop-blur-3xl px-6 sm:px-12 pt-10 pb-16 rounded-[2.5rem] border border-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] mb-20 overflow-hidden">
-                  
+
                   {/* Decorative subtle background shapes for Glassmorphism (Added warm Wood tones) */}
                   <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-wood/10 blur-3xl mix-blend-multiply pointer-events-none"></div>
                   <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 rounded-full bg-navy/5 blur-3xl mix-blend-multiply pointer-events-none"></div>
@@ -138,7 +154,7 @@ const Books = () => {
                         {shelf.books?.length || 0} Kitap
                       </span>
                     </div>
-                    
+
                     <button
                       onClick={() => setSelectedShelfForAdd(shelf)}
                       className="px-6 py-2.5 bg-navy text-cream font-bold rounded-full shadow-lg shadow-navy/20 hover:shadow-xl hover:-translate-y-1 hover:bg-sage transition-all duration-300 flex items-center gap-2 group"
@@ -147,25 +163,25 @@ const Books = () => {
                       Yeni Kitap Ekle
                     </button>
                   </div>
-                  
+
                   {shelf.books && shelf.books.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-24 gap-x-0 w-full relative z-10">
                       {shelf.books.map((bookId) => {
                         const bookData = booksDict[bookId];
                         return bookData ? (
                           <div key={bookId} className="relative px-6 pb-2 pt-4 flex flex-col justify-end group z-10 hover:z-50">
-                            
+
                             {/* Elegant Minimalist Floating Wood/Glass Shelf */}
                             <div className="absolute bottom-0 left-2 right-2 h-[8px] bg-gradient-to-r from-wood/30 via-wood/70 to-wood/30 backdrop-blur-xl shadow-[0_20px_30px_rgba(139,90,43,0.15)] border-t border-wood/40 rounded-full z-0 transform translate-y-1"></div>
-                            
+
                             {/* Sharp glass highlight reflection on the wood */}
                             <div className="absolute bottom-1.5 left-5 right-5 h-px bg-white/80 z-0 opacity-50"></div>
 
                             {/* The Book Card Container with dramatic lift on hover */}
                             <div className="relative z-10 w-full max-w-[260px] mx-auto h-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:-translate-y-6 group-hover:scale-[1.03]">
-                              <BookCard 
-                                book={bookData} 
-                                onRemove={() => handleRemoveBook(shelf._id, bookId)} 
+                              <BookCard
+                                book={bookData}
+                                onRemove={() => handleRemoveBook(shelf._id, bookId)}
                               />
                             </div>
                           </div>
@@ -188,10 +204,10 @@ const Books = () => {
         )}
       </div>
 
-      <CreateShelfModal 
-        isOpen={isCreateModalOpen} 
-        onClose={() => setIsCreateModalOpen(false)} 
-        onSuccess={() => fetchData()} 
+      <CreateShelfModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => fetchData()}
       />
 
       <AddBookModal

@@ -1,6 +1,11 @@
 import api from '../lib/axios';
 
 const ratingService = {
+  getUserRatings: async () => {
+    const response = await api.get('/ratings/user');
+    return response.data;
+  },
+
   addRating: async (bookId, rating) => {
     const response = await api.post('/ratings', { bookId, rating });
     return response.data;
