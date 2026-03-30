@@ -1,13 +1,16 @@
 import axios from 'axios';
 
+const ortamLinkimiz = import.meta.env.MODE === 'production'
+  ? 'https://readme-api-m7pb.onrender.com/api' // Canlıdayken Render'a git
+  : '/api'; // Kendi bilgisayarındayken vite proxy'sini kullan
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: ortamLinkimiz,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor for intercepting outgoing requests and attaching the Authorization token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');

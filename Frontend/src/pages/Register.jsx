@@ -21,8 +21,8 @@ const Register = () => {
 
     try {
       await register(name, email, password, bio, profileImage);
-      alert('Kayıt Başarılı!');
-      navigate('/profile');
+      // Başarılı kayıt sonrası yönlendirme
+      navigate('/home');
     } catch (err) {
       console.error(err);
       const serverMessage = err.response?.data?.status || err.response?.data?.error || err.response?.data?.message || 'Bilinmeyen bir hata oluştu.';

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import userService from '../services/user.service';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -33,6 +33,44 @@ const Profile = () => {
   // UI Tabs for future modularity (Arkadaşlar için yer tutucular)
   const [activeTab, setActiveTab] = useState('hakkinda'); // hakkinda, kitaplik, paylasimlar
 
+  const fetchProfileData = React.useCallback(async (showLoading = true) => {
+    try {
+      if (showLoading) setLoading(true);
+      setError(null);
+
+      // Fetch target user's profile
+      const responseData = await userService.getUserProfile(targetUserId);
+      const finalProfile = responseData.user || responseData.data || responseData;
+      setProfileData(finalProfile);
+
+      // Ensure modal edit form is ready if it's our own profile
+      if (isOwnProfile) {
+        setEditForm(prev => ({
+          ...prev,
+          name: finalProfile.name || '',
+          email: finalProfile.email || '',
+          bio: finalProfile.bio || '',
+          profileImage: finalProfile.profileImage || ''
+        }));
+      } else {
+        // Eğer bir başkasının profilindeysek, BİZ onu takip ediyor muyuz kontrol et!
+        try {
+          const myData = await userService.getUserProfile(user.id);
+          const myProfile = myData.user || myData.data || myData;
+          setIsFollowing(myProfile?.following?.some(f => (f._id || f) === targetUserId) || false);
+        } catch (myErr) {
+          console.warn("Kendi profilin çekilirken hata oluştu.", myErr);
+          setIsFollowing(false);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load user profile:", err);
+      setError(err.response?.data?.message || err.response?.data?.error || `Sunucuya erişilemedi: ${err.message}`);
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  }, [targetUserId, isOwnProfile, user?.id]);
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
@@ -40,50 +78,8 @@ const Profile = () => {
       return;
     }
 
-    const fetchProfileData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch target user's profile
-        const responseData = await userService.getUserProfile(targetUserId);
-        const finalProfile = responseData.user || responseData.data || responseData;
-        setProfileData(finalProfile);
-
-        // Ensure modal edit form is ready if it's our own profile
-        if (isOwnProfile) {
-          setEditForm(prev => ({
-            ...prev,
-            name: finalProfile.name || '',
-            email: finalProfile.email || '',
-            bio: finalProfile.bio || '',
-            profileImage: finalProfile.profileImage || ''
-          }));
-        } else {
-          // Eğer bir başkasının profilindeysek, BİZ onu takip ediyor muyuz kontrol et!
-          try {
-            const myData = await userService.getUserProfile(user.id);
-            const myProfile = myData.user || myData.data || myData;
-            if (myProfile && myProfile.following && myProfile.following.includes(targetUserId)) {
-              setIsFollowing(true);
-            } else {
-              setIsFollowing(false);
-            }
-          } catch (myErr) {
-            console.warn("Kendi profilin çekilirken hata oluştu. Veritabanından silinmiş olabilirsin (GHOST USER).", myErr);
-            setIsFollowing(false);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load user profile:", err);
-        setError(err.response?.data?.message || err.response?.data?.error || `Sunucuya erişilemedi: ${err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfileData();
-  }, [user, navigate, authLoading, targetUserId, isOwnProfile]);
+    fetchProfileData(true);
+  }, [user, navigate, authLoading, fetchProfileData]);
 
   if (authLoading || (!profileData && loading)) {
     return (
@@ -157,6 +153,8 @@ const Profile = () => {
     try {
       const res = await userService.toggleFollow(targetUserId);
       setIsFollowing(!isFollowing);
+      // Re-fetch profile data to update counts and follower/following lists
+      await fetchProfileData(false); 
     } catch (err) {
       console.error(err);
       alert('İşlem başarısız oldu: ' + (err.response?.data?.message || err.message));
@@ -299,13 +297,12 @@ const Profile = () => {
 
               {/* RESTORED VISIBLE STATS */}
               <div className="mt-4 flex justify-center sm:justify-start gap-6 font-medium text-navy/80 pb-2">
-                <div className="flex flex-col items-center sm:items-start group cursor-pointer">
+                <div className="flex flex-col items-center sm:items-start group cursor-pointer" onClick={() => setActiveTab('takip')}>
                   <span className="font-extrabold text-2xl text-navy group-hover:text-sage transition-colors">{displayUser.following?.length || 0}</span>
                   <span className="text-xs uppercase tracking-wide">Takip Edilen</span>
                 </div>
-                {/* Optional Placeholder for 'Takipçi' (Followers) when backend supports it */}
-                <div className="flex flex-col items-center sm:items-start opacity-50 cursor-not-allowed" title="Henüz API de desteklenmiyor">
-                  <span className="font-extrabold text-2xl text-navy">0</span>
+                <div className="flex flex-col items-center sm:items-start group cursor-pointer" onClick={() => setActiveTab('takipciler')}>
+                  <span className="font-extrabold text-2xl text-navy group-hover:text-sage transition-colors">{displayUser.followers?.length || 0}</span>
                   <span className="text-xs uppercase tracking-wide">Takipçi</span>
                 </div>
               </div>
@@ -316,8 +313,12 @@ const Profile = () => {
           <div className="bg-cream/40 px-6 pt-4 border-t border-sage/20 rounded-b-3xl">
             <div className="flex justify-center sm:justify-start gap-6 border-b border-sage/30 pb-[-1px]">
               <button onClick={() => setActiveTab('hakkinda')} className={`pb-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${activeTab === 'hakkinda' ? 'border-navy text-navy' : 'border-transparent text-wood/60 hover:text-navy'}`}>Hakkında</button>
-              <button onClick={() => navigate('/books')} className="pb-3 font-semibold text-sm sm:text-base border-b-2 transition-colors border-transparent text-wood/60 hover:text-navy">Kitaplık</button>
+              {isOwnProfile && (
+                <button onClick={() => navigate('/books')} className="pb-3 font-semibold text-sm sm:text-base border-b-2 transition-colors border-transparent text-wood/60 hover:text-navy">Kitaplık</button>
+              )}
               <button onClick={() => setActiveTab('paylasimlar')} className={`pb-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${activeTab === 'paylasimlar' ? 'border-navy text-navy' : 'border-transparent text-wood/60 hover:text-navy'}`}>Gönderiler</button>
+              <button onClick={() => setActiveTab('takip')} className={`pb-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${activeTab === 'takip' ? 'border-navy text-navy' : 'border-transparent text-wood/60 hover:text-navy'}`}>Takip Edilenler</button>
+              <button onClick={() => setActiveTab('takipciler')} className={`pb-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${activeTab === 'takipciler' ? 'border-navy text-navy' : 'border-transparent text-wood/60 hover:text-navy'}`}>Takipçiler</button>
             </div>
 
             <div className="py-8 text-center sm:text-left min-h-[250px]">
@@ -348,16 +349,96 @@ const Profile = () => {
                       <svg className="w-14 h-14 text-sage mb-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                       </svg>
-                      <p className="text-navy/90 font-medium text-lg">Henüz hiç paylaşım yapmadınız.</p>
-                      <p className="text-wood/80 text-sm mt-1 mb-5 text-center max-w-sm">
-                        Okuduğunuz kitaplar hakkında ilk düşüncenizi paylaşmak için harika bir zaman!
+                      {isOwnProfile ? (
+                        <>
+                          <p className="text-navy/90 font-medium text-lg">Henüz hiç paylaşım yapmadınız.</p>
+                          <p className="text-wood/80 text-sm mt-1 mb-5 text-center max-w-sm">
+                            Okuduğunuz kitaplar hakkında ilk düşüncenizi paylaşmak için harika bir zaman!
+                          </p>
+                          <button
+                            onClick={() => navigate('/social')}
+                            className="px-6 py-2.5 bg-sage text-white rounded-full text-sm font-semibold shadow-sm hover:bg-sage/90 hover:shadow-md transition-all duration-300"
+                          >
+                            İlk Gönderini Paylaş
+                          </button>
+                        </>
+                      ) : (
+                        <p className="text-navy/90 font-medium text-lg">Bu kullanıcı henüz bir paylaşım yapmamış.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'takip' && (
+                <div className="flex flex-col gap-4 text-left min-h-[160px]">
+                  
+                  {displayUser.following?.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {displayUser.following.map((followedUser) => (
+                        <div key={followedUser._id || followedUser} className="bg-white p-4 rounded-2xl border border-sage/10 shadow-sm flex items-center gap-4 cursor-pointer hover:shadow-md transition-all" onClick={() => navigate(`/profile/${followedUser._id || followedUser}`)}>
+                          {followedUser.profileImage && followedUser.profileImage.startsWith('http') ? (
+                            <img src={followedUser.profileImage} alt={followedUser.name || 'User'} className="w-12 h-12 rounded-full object-cover border-2 border-sage/20" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-navy to-sage text-white flex items-center justify-center font-bold text-lg">
+                              {getInitials(followedUser.name || 'U')}
+                            </div>
+                          )}
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="text-navy font-bold truncate">{followedUser.name || 'Bilinmeyen Kullanıcı'}</span>
+                            <span className="text-wood/60 text-sm truncate">{followedUser.email || ''}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-10 px-4 opacity-90 bg-white/50 rounded-2xl border border-sage/20 border-dashed">
+                      <svg className="w-14 h-14 text-sage mb-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                      </svg>
+                      {isOwnProfile ? (
+                        <>
+                          <p className="text-navy/90 font-medium text-lg">Henüz kimseyi takip etmiyorsunuz.</p>
+                          <button onClick={() => navigate('/')} className="mt-4 px-6 py-2.5 bg-sage text-white rounded-full text-sm font-semibold shadow-sm hover:bg-sage/90 transition-all duration-300">
+                            Kullanıcıları Keşfet
+                          </button>
+                        </>
+                      ) : (
+                        <p className="text-navy/90 font-medium text-lg">Bu kullanıcı henüz kimseyi takip etmiyor.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+              {activeTab === 'takipciler' && (
+                <div className="flex flex-col gap-4 text-left min-h-[160px]">
+                  {displayUser.followers?.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {displayUser.followers.map((followerUser) => (
+                        <div key={followerUser._id || followerUser} className="bg-white p-4 rounded-2xl border border-sage/10 shadow-sm flex items-center gap-4 cursor-pointer hover:shadow-md transition-all" onClick={() => navigate(`/profile/${followerUser._id || followerUser}`)}>
+                          {followerUser.profileImage && followerUser.profileImage.startsWith('http') ? (
+                            <img src={followerUser.profileImage} alt={followerUser.name || 'User'} className="w-12 h-12 rounded-full object-cover border-2 border-sage/20" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-navy to-sage text-white flex items-center justify-center font-bold text-lg">
+                              {getInitials(followerUser.name || 'U')}
+                            </div>
+                          )}
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="text-navy font-bold truncate">{followerUser.name || 'Bilinmeyen Kullanıcı'}</span>
+                            <span className="text-wood/60 text-sm truncate">{followerUser.email || ''}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-10 px-4 opacity-90 bg-white/50 rounded-2xl border border-sage/20 border-dashed">
+                      <svg className="w-14 h-14 text-sage mb-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.35r1.108-.022a1.229 1.229 0 011.087.643l.49 1.032m-6.77 0h6.77m-6.77 0a4.8 4.8 0 014.8-4.8c1.656 0 3.123.834 4.02 2.103m-4.02-2.103c.691 0 1.341.144 1.932.404a11.956 11.956 0 10-18.72 9.043l-.11-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                      </svg>
+                      <p className="text-navy/90 font-medium text-lg">Henüz takipçiniz bulunmuyor.</p>
+                      <p className="text-wood/80 text-sm mt-1 text-center max-w-sm">
+                        Paylaşımlar yaparak daha fazla okura ulaşabilirsin!
                       </p>
-                      <button
-                        onClick={() => navigate('/social')}
-                        className="px-6 py-2.5 bg-sage text-white rounded-full text-sm font-semibold shadow-sm hover:bg-sage/90 hover:shadow-md transition-all duration-300"
-                      >
-                        İlk Gönderini Paylaş
-                      </button>
                     </div>
                   )}
                 </div>

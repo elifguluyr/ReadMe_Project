@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import bookService from '../services/book.service';
 import { useAuth } from '../context/AuthContext';
 import postService from '../services/postService';
@@ -7,10 +8,13 @@ import PostCard from '../components1/social/PostCard';
 
 
 const Home = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorInfo, setErrorInfo] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
@@ -40,32 +44,50 @@ const Home = () => {
   const handlePostDeleted = (deletedId) => setPosts((prev) => prev.filter(p => p._id !== deletedId));
   const handlePostUpdated = (updatedPost) => setPosts((prev) => prev.map(p => p._id === updatedPost._id ? updatedPost : p));
 
+  const loadAllBooks = async () => {
+    setLoading(true);
+    try {
+      const response = await bookService.getBooks();
+      let booksData = [];
+      if (Array.isArray(response)) {
+         booksData = response;
+      } else if (response && Array.isArray(response.books)) {
+         booksData = response.books;
+      } else if (response && Array.isArray(response.data)) {
+         booksData = response.data;
+      }
+      setBooks(booksData);
+    } catch (error) {
+      console.error('Kitaplar yüklenirken hata:', error);
+      setErrorInfo("API Hatası: " + (error.message || JSON.stringify(error)));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchBooks = async () => {
+    loadAllBooks();
+  }, []);
+
+  const handleSearch = async (e) => {
+    if (e.key === 'Enter') {
+      if (!searchQuery.trim()) {
+        loadAllBooks();
+        return;
+      }
+      setIsSearching(true);
+      setLoading(true);
       try {
-        const response = await bookService.getBooks();
-        console.log("DB'den gelen kitap verisi:", response);
-        
-        let booksData = [];
-        if (Array.isArray(response)) {
-           booksData = response;
-        } else if (response && Array.isArray(response.books)) {
-           booksData = response.books;
-        } else if (response && Array.isArray(response.data)) {
-           booksData = response.data;
-        }
-        
-        setBooks(booksData);
-      } catch (error) {
-        console.error('Kitaplar yüklenirken hata:', error);
-        setErrorInfo("API Hatası: " + (error.message || JSON.stringify(error)));
+        const results = await bookService.searchBooks(searchQuery);
+        setBooks(results || []);
+      } catch (err) {
+        setErrorInfo("Arama Hatası: " + err.message);
       } finally {
+        setIsSearching(false);
         setLoading(false);
       }
-    };
-
-    fetchBooks();
-  }, []);
+    }
+  };
 
   return (
     // Ana konteyner: H-screen ile eğer App.jsx de header varsa ona göre yüksekliğini ayarlar. 
@@ -74,34 +96,38 @@ const Home = () => {
       <style>{scrollbarStyles}</style>
       {/* 1) SOL TARAF: NAVBAR (ELİF'İN ALANI) - Placeholder */}
       <aside className="w-[240px] bg-[#f0ebd8] border-r border-[#e3dac1] flex flex-col pt-8 pb-4 px-6 shadow-sm z-20 shrink-0">
-        <div className="mb-10 pl-2">
-          <span className="text-xs font-bold text-wood/50 uppercase tracking-widest">[ Elif'in Alanı ]</span>
-        </div>
-        
+
         <nav className="flex-1 space-y-4">
-          <div className="flex items-center gap-4 px-4 py-3 rounded-xl bg-sage/20 text-navy font-bold border border-sage/30 shadow-sm cursor-not-allowed">
+          <div onClick={() => navigate('/home')} className="flex items-center gap-4 px-4 py-3 rounded-xl bg-sage/20 text-navy font-bold border border-sage/30 shadow-sm cursor-pointer hover:bg-sage/30 transition-colors">
             <svg className="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
             Home
           </div>
-          <div className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/40 text-wood/80 font-medium cursor-not-allowed transition-colors">
+          <div onClick={() => navigate('/books')} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/40 text-wood/80 font-medium cursor-pointer transition-colors">
             <svg className="w-5 h-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
             My Library
           </div>
-          <div className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/40 text-wood/80 font-medium cursor-not-allowed transition-colors">
+          <div onClick={() => navigate('/social')} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/40 text-wood/80 font-medium cursor-pointer transition-colors">
             <svg className="w-5 h-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
             </svg>
             Social
           </div>
-          <div className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/40 text-wood/80 font-medium cursor-not-allowed transition-colors">
+          <div onClick={() => navigate('/profile')} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/40 text-wood/80 font-medium cursor-pointer transition-colors">
             <svg className="w-5 h-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             Profile
+          </div>
+          <div className="pt-2 mt-2 border-t border-wood/10"></div>
+          <div onClick={() => { if(window.confirm('Çıkış yapmak istediğinize emin misiniz?')) { logout(); navigate('/login'); } }} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 font-medium cursor-pointer transition-colors group">
+            <svg className="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Çıkış Yap
           </div>
         </nav>
       </aside>
@@ -113,21 +139,22 @@ const Home = () => {
         <main className="flex-1 flex flex-col h-full overflow-hidden bg-cream/30">
           
           {/* ÜST ORTA KISIM: SEARCH BAR (ELİF'İN ALANI) */}
-          <header className="h-[84px] shrink-0 bg-cream/80 backdrop-blur-2xl border-b border-sage/20 flex items-center px-10 z-20 shadow-[0_4px_30px_-10px_rgba(0,0,0,0.05)]">
-            <span className="text-xs font-bold text-wood/60 uppercase tracking-widest mr-6">[ Elif ]</span>
-            <div className="relative w-full max-w-lg">
+          <header className="h-[84px] shrink-0 bg-cream/80 backdrop-blur-2xl border-b border-sage/20 flex items-center px-10 z-20 shadow-[0_4px_30px_-10px_rgba(0,0,0,0.05)] justify-end">
+            <div className="relative w-full max-w-2xl cursor-text">
               <div className="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none">
-                <div className="bg-sage/15 p-2 rounded-full mt-0.5 ml-0.5">
-                  <svg className="w-5 h-5 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                <div className={`p-2 rounded-full mt-0.5 ml-0.5 transition-colors ${isSearching ? 'bg-navy/20 animate-pulse' : 'bg-sage/25'}`}>
+                  <svg className={`w-5 h-5 ${isSearching ? 'text-sage' : 'text-navy'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ strokeWidth: '3' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                   </svg>
                 </div>
               </div>
               <input 
                 type="text" 
-                placeholder="Search books..." 
-                readOnly
-                className="w-full bg-white/90 backdrop-blur-md border border-sage/30 shadow-sm rounded-full pl-14 pr-6 py-3 text-navy font-bold placeholder-wood/40 focus:outline-none focus:ring-2 focus:ring-navy/30 transition-shadow cursor-not-allowed"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+                placeholder="Kitap ara ve Enter'a bas..." 
+                className="w-full bg-white/90 backdrop-blur-md border border-sage/30 shadow-sm rounded-full pl-14 pr-6 py-3 text-navy font-bold placeholder-wood/40 focus:outline-none focus:ring-2 focus:ring-navy/30 transition-shadow"
               />
             </div>
           </header>

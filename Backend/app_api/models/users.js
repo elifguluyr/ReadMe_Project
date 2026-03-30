@@ -25,6 +25,10 @@ const user = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user' 
     }],
+    followers: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'user' 
+    }],
     shelf: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Shelf'

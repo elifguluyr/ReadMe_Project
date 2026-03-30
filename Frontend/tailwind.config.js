@@ -15,7 +15,7 @@ export default {
       colors: {
         'sage': '#8BA888',     // Huzurlu Adaçayı Yeşili
         'wood': '#201d1a',     // Soft Toprak Kahvesi
-        'navy': '#4A5D82',     // Yumuşak Lacivert
+        'navy': '#1a365d',     // Daha Keskin ve Koyu Lacivert (Contrast için)
         'cream': '#F9F6F0'     // Arka planlar için yumuşak krem
       }
     },

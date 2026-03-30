@@ -19,7 +19,7 @@ const Login = () => {
     try {
       await login(email, password);
       alert('Giriş Başarılı!');
-      navigate('/profile');
+      navigate('/home');
     } catch (err) {
       console.error(err);
       const serverMessage = err.response?.data?.status || err.response?.data?.error || 'Bilinmeyen bir hata oluştu.';

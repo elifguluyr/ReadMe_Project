@@ -2,7 +2,8 @@ import api from '../lib/axios';
 
 class UserService {
   async getUserProfile(userId) {
-    const response = await api.get(`/profile/${userId}`);
+    const timestamp = new Date().getTime();
+    const response = await api.get(`/profile/${userId}?t=${timestamp}`);
     return response.data;
   }
 
