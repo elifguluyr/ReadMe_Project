@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var dbURI = process.env.MONGODB_URI || 'mongodb+srv://TrioReads:TrioReads123@cluster0.epc63ez.mongodb.net/?appName=Cluster0/ReadMeDB';
+var dbURI = process.env.MONGODB_URI || 'mongodb+srv://verdaer49_db_user:1234@trioreads.h1uhyll.mongodb.net/?appName=TrioReads';
 mongoose.connect(dbURI);
 mongoose.connection.on('connected', function () {
     console.log(dbURI + ' adresindeki veritabanına bağlanıldı.');
