@@ -9,6 +9,6 @@ Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST
 ## Grup Üyelerinin REST API Metotları
 
 1. [Efsa Nur Bölükbaş'ın REST API Metotları](Efsa-Nur-Bolukbas/Efsa-Nur-Bolukbas-Rest-API-Gorevleri.md)
-2. [Grup Üyesi 2'nin REST API Metotları](Grup-Uyesi-2/Grup-Uyesi-2-Rest-API-Gorevleri.md)
+2. [Verda Er'in REST API Metotları](Verda-Er/Verda-Er-Rest-API-Gorevleri.md)
 3. [Grup Üyesi 3'ün REST API Metotları](Grup-Uyesi-3/Grup-Uyesi-3-Rest-API-Gorevleri.md)
 

@@ -9,7 +9,7 @@ Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı den
 ## Grup Üyelerinin Web Frontend Görevleri
 
 1. [Efsa Nur Bölükbaş Web Frontend Görevleri](Efsa-Nur-Bolukbas/Efsa-Nur-Bolukbas-Web-Frontend-Gorevleri.md)
-2. [Grup Üyesi 2'nin Web Frontend Görevleri](Grup-Uyesi-2/Grup-Uyesi-2-Frontend-Gorevleri.md)
+2. [Verda Er Web Frontend Görevleri](Verda-Er/Verda-Er-Web-Frontend-Gorevleri.md)
 3. [Grup Üyesi 3'ün Web Frontend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Frontend-Gorevleri.md)
 
 
