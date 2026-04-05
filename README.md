@@ -21,9 +21,8 @@ Kitap İnceleme ve Sosyal Paylaşım Platformu
 
 ## Proje Linkleri
 
-- **REST API Adresi:** [api.yazmuh.com](https://api.yazmuh.com)
-- **Web Frontend Adresi:** [frontend.yazmuh.com](https://frontend.yazmuh.com)
-
+- **REST API Adresi:** [api.ReadMe.com](https://readme-api-m7pb.onrender.com)
+- **Web Frontend Adresi:** [frontend.ReadMe.com](https://read-me-gamma.vercel.app)
 ---
 
 ## Proje Ekibi

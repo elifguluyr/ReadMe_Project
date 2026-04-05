@@ -1,6 +1,6 @@
 # Web Frontend Görev Dağılımı
 
-**Web Frontend Adresi:** [frontend.yazmuh.com](https://frontend.yazmuh.com)
+**Web Frontend Adresi:** [frontend.ReadMe.com](https://read-me-gamma.vercel.app)
 
 Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı deneyimi (UX) görevleri listelenmektedir. Her grup üyesi, kendisine atanan sayfaların tasarımı, implementasyonu ve kullanıcı etkileşimlerinden sorumludur.
 
@@ -10,7 +10,7 @@ Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı den
 
 1. [Efsa Nur Bölükbaş Web Frontend Görevleri](Efsa-Nur-Bolukbas/Efsa-Nur-Bolukbas-Web-Frontend-Gorevleri.md)
 2. [Verda Er Web Frontend Görevleri](Verda-Er/Verda-Er-Web-Frontend-Gorevleri.md)
-3. [Grup Üyesi 3'ün Web Frontend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Frontend-Gorevleri.md)
+3. [Elif Gül Uyar Web Frontend Görevleri](Elif-Gül-Uyar/Elif-Gül-Uyar-Web-Frontend-Görevleri.md)
 
 
 ---
@@ -18,84 +18,84 @@ Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı den
 ## Genel Web Frontend Prensipleri
 
 ### 1. Responsive Tasarım
-- **Mobile-First Approach:** Önce mobil tasarım, sonra desktop
+- **Mobile-First Approach:** Önce mobil tasarım, sonra desktop (Tailwind CSS ile)
 - **Breakpoints:** 
-  - Mobile: < 768px
-  - Tablet: 768px - 1024px
-  - Desktop: > 1024px
-- **Flexible Layouts:** CSS Grid ve Flexbox kullanımı
-- **Responsive Images:** srcset ve sizes attributes
-- **Touch-Friendly:** Minimum 44x44px touch targets
+  - Mobile: < 768px (sm)
+  - Tablet: 768px - 1024px (md)
+  - Desktop: > 1024px (lg, xl)
+- **Flexible Layouts:** Tailwind CSS Flexbox ve Grid kullanımı
+- **Responsive Images:** Next.js Image component veya srcset (gelecekte)
+- **Touch-Friendly:** Minimum 44x44px touch targets, kitap kartları ve butonlar için
 
 ### 2. Tasarım Sistemi
-- **CSS Framework:** Bootstrap, Tailwind CSS, Material-UI, veya custom
-- **Renk Paleti:** Tutarlı renk kullanımı (CSS variables)
-- **Tipografi:** Web-safe fonts veya web fonts (Google Fonts)
-- **Spacing:** Tutarlı padding ve margin değerleri (8px grid sistemi)
-- **Iconography:** Icon library (Font Awesome, Material Icons, Heroicons)
-- **Component Library:** Reusable UI components
+- **CSS Framework:** Tailwind CSS 
+- **Renk Paleti:** Tailwind varsayılan paleti, kitap temalı renkler (mavi tonları)
+- **Tipografi:** Tailwind font ailesi, Google Fonts entegrasyonu
+- **Spacing:** Tailwind spacing scale (4px grid sistemi)
+- **Iconography:** Heroicons veya Lucide React icons
+- **Component Library:** Reusable React components (BookCard, RatingSystem, Modal'lar)
 
 ### 3. Performans Optimizasyonu
-- **Code Splitting:** Route-based ve component-based splitting
-- **Lazy Loading:** Images, components, ve routes
-- **Minification:** CSS ve JavaScript minification
-- **Compression:** Gzip/Brotli compression
-- **Caching:** Browser caching, service worker (PWA)
-- **Bundle Size:** Tree shaking, dead code elimination
+- **Code Splitting:** Vite ile route-based ve component-based splitting
+- **Lazy Loading:** React.lazy ile components ve routes
+- **Minification:** Vite build ile otomatik minification
+- **Compression:** Vercel/Netlify hosting ile Gzip/Brotli
+- **Caching:** Browser caching, service worker (PWA için gelecekte)
+- **Bundle Size:** Tree shaking, unused CSS elimination (Tailwind Purge)
 
 ### 4. SEO (Search Engine Optimization)
-- **Meta Tags:** Title, description, keywords
-- **Structured Data:** JSON-LD schema markup
-- **Semantic HTML:** Proper HTML5 semantic elements
-- **Alt Text:** Image alt attributes
-- **Sitemap:** XML sitemap generation
-- **Robots.txt:** Search engine crawling rules
+- **Meta Tags:** React Helmet ile dinamik title, description
+- **Structured Data:** Kitap şemaları için JSON-LD (gelecekte)
+- **Semantic HTML:** React semantic elements (main, article, section)
+- **Alt Text:** Kitap kapakları için alt attributes
+- **Sitemap:** Dinamik sitemap generation (kitap sayfaları için)
+- **Robots.txt:** Search engine crawling kuralları
 
 ### 5. Erişilebilirlik (Accessibility)
 - **WCAG 2.1 AA Compliance:** Minimum accessibility standard
-- **Keyboard Navigation:** Tab order, focus management
-- **Screen Reader Support:** ARIA labels, roles, landmarks
-- **Color Contrast:** Minimum 4.5:1 ratio
-- **Focus Indicators:** Visible focus states
-- **Skip Links:** Skip to main content
+- **Keyboard Navigation:** Tab order, focus management (React focus hooks)
+- **Screen Reader Support:** ARIA labels, roles (rating sisteminde)
+- **Color Contrast:** Tailwind renklerinde minimum 4.5:1 ratio
+- **Focus Indicators:** Visible focus states (Tailwind focus classes)
+- **Skip Links:** Ana içeriğe atlama linki
 
 ### 6. Browser Compatibility
-- **Modern Browsers:** Chrome, Firefox, Safari, Edge (son 2 versiyon)
-- **Polyfills:** ES6+ features için gerekli polyfills
-- **CSS Prefixes:** Autoprefixer kullanımı
-- **Feature Detection:** Modernizr veya native feature detection
-- **Graceful Degradation:** Eski tarayıcılar için fallback
+- **Modern Browsers:** Chrome, Firefox, Safari, Edge 
+- **Polyfills:** React ve Vite ile ES6+ native support
+- **CSS Prefixes:** Autoprefixer (Tailwind içinde)
+- **Feature Detection:** Native feature detection
+- **Graceful Degradation:** Eski tarayıcılar için fallback (progressive enhancement)
 
 ### 7. State Management
-- **Global State:** Redux, Zustand, Context API (React), Vuex/Pinia (Vue)
-- **Local State:** Component state, hooks
-- **Server State:** React Query, SWR, Apollo Client
-- **Form State:** React Hook Form, Formik, React Final Form
+- **Global State:** React Context API (AuthContext için)
+- **Local State:** useState, useReducer hooks
+- **Server State:** Axios ile manuel, React Query (gelecekte)
+- **Form State:** Controlled components, validation hooks
 
 ### 8. Routing
-- **Client-Side Routing:** React Router, Vue Router, Angular Router
-- **Deep Linking:** URL-based navigation
-- **Protected Routes:** Authentication guards
+- **Client-Side Routing:** React Router DOM 
+- **Deep Linking:** URL-based navigation (/books, /profile, /social)
+- **Protected Routes:** Authentication guards (AuthContext ile)
 - **404 Handling:** Custom 404 page
-- **History Management:** Browser history API
+- **History Management:** React Router history API
 
 ### 9. API Entegrasyonu
-- **HTTP Client:** Axios, Fetch API, ky
-- **Request Interceptors:** Token injection, error handling
+- **HTTP Client:** Axios 
+- **Request Interceptors:** JWT token injection (AuthContext'ten)
 - **Response Interceptors:** Error handling, token refresh
-- **Error Handling:** Centralized error handling
-- **Loading States:** Global loading indicator
+- **Error Handling:** Centralized error handling (Toast notifications)
+- **Loading States:** Global loading indicator (skeleton loaders)
 
 ### 10. Testing
-- **Unit Tests:** Jest, Vitest, Mocha
-- **Integration Tests:** React Testing Library, Vue Test Utils
-- **E2E Tests:** Cypress, Playwright, Selenium
-- **Visual Regression:** Percy, Chromatic
-- **Accessibility Tests:** axe-core, Lighthouse
+- **Unit Tests:** Jest, Vitest (henüz implement edilmedi)
+- **Integration Tests:** React Testing Library (gelecekte)
+- **E2E Tests:** Playwright (demo için)
+- **Visual Regression:** Chromatic (gelecekte)
+- **Accessibility Tests:** axe-core, Lighthouse CI
 
 ### 11. Build ve Deployment
-- **Build Tool:** Webpack, Vite, Parcel, esbuild
-- **Module Bundler:** ES modules, CommonJS
-- **Environment Variables:** .env files
-- **CI/CD:** GitHub Actions, GitLab CI, Jenkins
-- **Hosting:** Vercel, Netlify, AWS, Azure
+- **Build Tool:** Vite 
+- **Module Bundler:** ES modules
+- **Environment Variables:** .env files (VITE_ prefix)
+- **CI/CD:** Vercel deployment (vercel.json)
+- **Hosting:** Vercel, Netlify

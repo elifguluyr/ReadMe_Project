@@ -1,6 +1,6 @@
 # REST API Görev Dağılımı
 
-**REST API Adresi:** [api.yazmuh.com](https://api.yazmuh.com)
+**REST API Adresi:** [api.ReadMe.com](https://readme-api-m7pb.onrender.com)
 
 Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST API metotları listelenmektedir.
 
@@ -10,5 +10,5 @@ Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST
 
 1. [Efsa Nur Bölükbaş'ın REST API Metotları](Efsa-Nur-Bolukbas/Efsa-Nur-Bolukbas-Rest-API-Gorevleri.md)
 2. [Verda Er'in REST API Metotları](Verda-Er/Verda-Er-Rest-API-Gorevleri.md)
-3. [Grup Üyesi 3'ün REST API Metotları](Grup-Uyesi-3/Grup-Uyesi-3-Rest-API-Gorevleri.md)
+3. [Elif Gül Uyar'ın REST API Metotları](Elif-Gül-Uyar/Elif-Gül-Uyar-Rest-API-Görevleri.md)
 
