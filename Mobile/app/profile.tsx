@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Alert, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Alert, Pressable, ActivityIndicator, Image } from 'react-native';
 import {
   View,
   Text,
@@ -10,48 +10,140 @@ import {
   TextInput,
   SafeAreaView
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import Feather from '@expo/vector-icons/build/Feather';
-import Ionicons from '@expo/vector-icons/build/Ionicons';
+import { Feather, Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { userAPI } from '../services/api';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { id } = useLocalSearchParams(); 
 
-  // Şimdilik API olmadığı için sahte (mock) kullanıcı verisi
   const [user, setUser] = useState({
-    name: 'Elif Gül Uyar',
-    email: 'elif@example.com',
-    bio: 'Yeni kitaplar keşfetmeyi seviyorum.',
-    following: 42,
-    followers: 18,
+    name: '',
+    email: '',
+    bio: '',
+    followingCount: 0,
+    followersCount: 0,
+    followingList: [] as any[],
+    followersList: [] as any[],
     posts: [] as { id: number; content: string; date: string }[],
     profileImage: '',
   });
 
-  const [activeTab, setActiveTab] = useState('hakkinda'); // hakkinda, paylasimlar
+  const [activeTab, setActiveTab] = useState('hakkinda');
   const [isEditing, setIsEditing] = useState(false);
   const [isFollowsModalVisible, setIsFollowsModalVisible] = useState(false);
   const [followsModalTab, setFollowsModalTab] = useState('following'); 
   const [editForm, setEditForm] = useState({ ...user });
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isOwnProfile, setIsOwnProfile] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [id]);
+
+  const fetchProfile = async () => {
+    setIsLoading(true);
+    try {
+      const loggedInUserId = await AsyncStorage.getItem('userId');
+      const targetUserId = id || loggedInUserId;
+      
+      if (!targetUserId) {
+        setIsLoading(false);
+        router.replace('/login');
+        return;
+      }
+
+      setIsOwnProfile(targetUserId === loggedInUserId);
+      const data = await userAPI.getProfile(targetUserId);
+
+      const userData = {
+        name: data.name || '',
+        email: data.email || '',
+        bio: data.bio || '',
+        followingCount: data.following ? data.following.length : 0,
+        followersCount: data.followers ? data.followers.length : 0,
+        followingList: data.following || [],
+        followersList: data.followers || [],
+        posts: data.posts || [],
+        profileImage: data.profileImage || '',
+      };
+
+      setUser(userData);
+      setEditForm(userData);
+
+      if (targetUserId !== loggedInUserId) {
+        const myData = await userAPI.getProfile(loggedInUserId);
+        const myFollowing = myData.following || [];
+        const followingIds = myFollowing.map((u: any) => (typeof u === 'object' ? u._id : u));
+        setIsFollowing(followingIds.includes(targetUserId));
+      }
+    } catch (err) {
+      Alert.alert('Hata', 'Profil bilgileri alınamadı.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getInitials = (name: string) => {
+    if (!name) return 'U';
     const parts = name.trim().split(' ');
     if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
     return name.slice(0, 2).toUpperCase();
   };
 
-  const handleUpdate = () => {
-    setUser({ ...user, ...editForm });
-    setIsEditing(false);
-    alert('Profil başarıyla güncellendi!');
+  const handleUpdate = async () => {
+    try {
+      const updateData: any = { ...editForm };
+      if (password) {
+        updateData.password = password;
+      }
+      await userAPI.updateProfile(updateData);
+      setUser({ ...user, ...editForm });
+      setIsEditing(false);
+      Alert.alert('Başarılı', 'Profil başarıyla güncellendi!');
+    } catch (err) {
+      Alert.alert('Hata', 'Profil güncellenirken bir hata oluştu.');
+    }
   };
 
-  const handleLogout = () => {
-    // İleride buraya Token silme işlemi gelecek
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('userToken');
+    await AsyncStorage.removeItem('userId');
+    await AsyncStorage.removeItem('userData');
     router.replace('/login');
   };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await userAPI.deleteAccount();
+      await handleLogout();
+      Alert.alert('Başarılı', 'Hesabınız silindi.');
+    } catch (err) {
+      Alert.alert('Hata', 'Hesap silinirken hata oluştu.');
+    }
+  };
+
+  const handleToggleFollow = async () => {
+    try {
+      await userAPI.toggleFollow(id);
+      fetchProfile(); 
+    } catch (err) {
+      Alert.alert('Hata', 'İşlem başarısız oldu.');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#354c79" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,27 +163,45 @@ export default function ProfileScreen() {
           {/* Avatar ve Butonlar (Banner'ın üstüne taşan kısım) */}
           <View style={styles.topSection}>
             <View style={styles.avatarContainer}>
-              <Text style={styles.avatarText}>{getInitials(user.name)}</Text>
+              {user.profileImage && user.profileImage !== 'default_avatar.jpg' && user.profileImage !== '' ? (
+                <Image source={{ uri: user.profileImage }} style={{ width: 90, height: 90, borderRadius: 45 }} />
+              ) : (
+                <Text style={styles.avatarText}>{getInitials(user.name)}</Text>
+              )}
             </View>
             
             <View style={styles.actionButtons}>
-              <Pressable 
-                style={({ pressed }) => [
-                  styles.editButton, 
-                  pressed && { backgroundColor: '#8BA888' }
-                ]} 
-                onPress={() => setIsEditing(true)}
-              >
-                <Text style={styles.editButtonText}>Profili Düzenle</Text>
-              </Pressable>
-              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Text style={styles.logoutButtonText}>Çıkış Yap</Text>
-              </TouchableOpacity>
+              {isOwnProfile ? (
+                <>
+                  <Pressable 
+                    style={({ pressed }) => [
+                      styles.editButton, 
+                      pressed && { backgroundColor: '#8BA888' }
+                    ]} 
+                    onPress={() => setIsEditing(true)}
+                  >
+                    <Text style={styles.editButtonText}>Profili Düzenle</Text>
+                  </Pressable>
+                  <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                    <Text style={styles.logoutButtonText}>Çıkış Yap</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity 
+                  style={[styles.editButton, isFollowing && { backgroundColor: '#8BA888' }]} 
+                  onPress={handleToggleFollow}
+                >
+                  <Text style={styles.editButtonText}>
+                    {isFollowing ? 'Takipten Çık' : 'Takip Et'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
           {/* Kullanıcı Bilgileri */}
           <View style={styles.userInfo}>
+            <Text style={styles.nameText}>{user.name}</Text>
             <View style={styles.emailRow}>
                 <Feather name="mail" size={16} color="#704f4a" />
                 <Text style={styles.emailText}>{user.email}</Text>
@@ -102,7 +212,7 @@ export default function ProfileScreen() {
                 style={styles.statBox} 
                 onPress={() => { setFollowsModalTab('following'); setIsFollowsModalVisible(true); }}
               >
-                <Text style={styles.statNumber}>{user.following}</Text>
+                <Text style={styles.statNumber}>{user.followingCount}</Text>
                 <Text style={styles.statLabel}>TAKİP EDİLEN</Text>
               </TouchableOpacity>
 
@@ -110,7 +220,7 @@ export default function ProfileScreen() {
                 style={styles.statBox} 
                 onPress={() => { setFollowsModalTab('followers'); setIsFollowsModalVisible(true); }}
               >
-                <Text style={styles.statNumber}>{user.followers}</Text>
+                <Text style={styles.statNumber}>{user.followersCount}</Text>
                 <Text style={styles.statLabel}>TAKİPÇİ</Text>
               </TouchableOpacity>
             </View>
@@ -122,10 +232,11 @@ export default function ProfileScreen() {
               <TouchableOpacity style={[styles.tab, activeTab === 'hakkinda' && styles.activeTab]} onPress={() => setActiveTab('hakkinda')}>
                 <Text style={[styles.tabText, activeTab === 'hakkinda' && styles.activeTabText]}>Hakkında</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity style={styles.tab} onPress={() => router.push('/books' as any)}>
-                <Text style={styles.tabText}>Kitaplık</Text>
-              </TouchableOpacity>
+              {isOwnProfile && (
+                <TouchableOpacity style={styles.tab} onPress={() => router.push('/books' as any)}>
+                  <Text style={styles.tabText}>Kitaplık</Text>
+                </TouchableOpacity>
+              )}
 
               <TouchableOpacity style={[styles.tab, activeTab === 'paylasimlar' && styles.activeTab]} onPress={() => setActiveTab('paylasimlar')}>
                 <Text style={[styles.tabText, activeTab === 'paylasimlar' && styles.activeTabText]}>Gönderiler</Text>
@@ -154,14 +265,20 @@ export default function ProfileScreen() {
                 ) : (
                   <View style={styles.emptyStateContainer}>
                     <Text style={styles.emptyStateIcon}>📄</Text>
-                    <Text style={styles.emptyStateTitle}>Henüz hiç paylaşım yapmadınız.</Text>
-                    <Text style={styles.emptyStateDesc}>
-                      Okuduğunuz kitaplar hakkında ilk düşüncenizi paylaşmak için harika bir zaman!
-                    </Text>
-                    {/* Gönderi Sayfasına Gidiş */}
-                    <TouchableOpacity style={styles.emptyStateButton} onPress={() => router.push('/social' as any)}>
-                      <Text style={styles.emptyStateButtonText}>İlk Gönderini Paylaş</Text>
-                    </TouchableOpacity>
+                    {isOwnProfile ? (
+                      <>
+                        <Text style={styles.emptyStateTitle}>Henüz hiç paylaşım yapmadınız.</Text>
+                        <Text style={styles.emptyStateDesc}>
+                          Okuduğunuz kitaplar hakkında ilk düşüncenizi paylaşmak için harika bir zaman!
+                        </Text>
+                        {/* Gönderi Sayfasına Gidiş */}
+                        <TouchableOpacity style={styles.emptyStateButton} onPress={() => router.push('/social' as any)}>
+                          <Text style={styles.emptyStateButtonText}>İlk Gönderini Paylaş</Text>
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <Text style={styles.emptyStateTitle}>Bu kullanıcının hiç gönderisi yok.</Text>
+                    )}
                   </View>
                 )}
               </View>
@@ -192,15 +309,57 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Liste Alanı (Şimdilik Boş/Mock) */}
+            {/* Liste Alanı */}
             <ScrollView style={{ marginTop: 20 }}>
-              <View style={styles.emptyFollowsContainer}>
-                <Text style={styles.emptyFollowsText}>
-                  {followsModalTab === 'following' 
-                    ? "Henüz kimseyi takip etmiyorsunuz." 
-                    : "Henüz takipçiniz bulunmuyor."}
-                </Text>
-              </View>
+              {followsModalTab === 'following' ? (
+                user.followingList.length > 0 ? (
+                  user.followingList.map((item, idx) => (
+                    <TouchableOpacity 
+                      key={item._id || idx} 
+                      style={styles.followItem}
+                      onPress={() => {
+                        setIsFollowsModalVisible(false);
+                        router.push(`/profile?id=${item._id}`);
+                      }}
+                    >
+                      <View style={styles.followAvatar}>
+                        {item.profileImage && item.profileImage !== 'default_avatar.jpg' ? (
+                          <Image source={{ uri: item.profileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+                        ) : (
+                          <Text style={styles.followAvatarText}>{getInitials(item.name)}</Text>
+                        )}
+                      </View>
+                      <Text style={styles.followName}>{item.name}</Text>
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <View style={styles.emptyFollowsContainer}><Text style={styles.emptyFollowsText}>Henüz kimseyi takip etmiyorsunuz.</Text></View>
+                )
+              ) : (
+                user.followersList.length > 0 ? (
+                  user.followersList.map((item, idx) => (
+                    <TouchableOpacity 
+                      key={item._id || idx} 
+                      style={styles.followItem}
+                      onPress={() => {
+                        setIsFollowsModalVisible(false);
+                        router.push(`/profile?id=${item._id}`);
+                      }}
+                    >
+                      <View style={styles.followAvatar}>
+                        {item.profileImage && item.profileImage !== 'default_avatar.jpg' ? (
+                          <Image source={{ uri: item.profileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+                        ) : (
+                          <Text style={styles.followAvatarText}>{getInitials(item.name)}</Text>
+                        )}
+                      </View>
+                      <Text style={styles.followName}>{item.name}</Text>
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <View style={styles.emptyFollowsContainer}><Text style={styles.emptyFollowsText}>Henüz takipçiniz bulunmuyor.</Text></View>
+                )
+              )}
             </ScrollView>
 
             <TouchableOpacity 
@@ -226,7 +385,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20 }}>
+            <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20 }}>
               
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Ad Soyad</Text>
@@ -287,7 +446,7 @@ export default function ProfileScreen() {
                     "Hesabınızı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
                     [
                       { text: "Vazgeç", style: "cancel" },
-                      { text: "SİL", onPress: () => Alert.alert("Backend bağlandığında hesap silinecek."), style: "destructive" }
+                      { text: "SİL", onPress: handleDeleteAccount, style: "destructive" }
                     ]
                   );
                 }}
@@ -337,7 +496,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         {/* Profil */}
-        <TouchableOpacity style={styles.navItem} onPress={() => {}}>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.replace('/profile')}>
           <Ionicons name="person-outline" size={24} color="#704f4a" style={{ marginBottom: 4 }} />
           <Text style={styles.navTextActive}>Profil</Text>
         </TouchableOpacity>
@@ -470,4 +629,22 @@ const styles = StyleSheet.create({
     gap: 6,               
     marginTop: 4          
   },
+  followItem: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 12, 
+    borderBottomWidth: 1, 
+    borderBottomColor: '#F3F4F6',
+    gap: 12
+  },
+  followAvatar: { 
+    width: 40, 
+    height: 40, 
+    borderRadius: 20, 
+    backgroundColor: '#8BA888', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  followAvatarText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 14 },
+  followName: { fontSize: 16, color: '#354c79', fontWeight: '600' },
 });

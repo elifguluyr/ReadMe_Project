@@ -10,8 +10,11 @@ import {
   ActivityIndicator,
   ScrollView,
   Image,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authAPI, decodeJWT } from '../services/api';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -20,13 +23,36 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     setIsLoading(true);
-    // API simülasyonu
-    setTimeout(() => {
-      alert('Kayıt Başarılı! (Şimdilik sadece arayüz)');
+
+    try {
+      if (!name || !email || !password) {
+        Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz.');
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await authAPI.register(name, email, password);
+      
+      const token = data.token;
+      await AsyncStorage.setItem('userToken', token);
+      
+      const decoded = decodeJWT(token);
+      if (decoded && decoded._id) {
+        await AsyncStorage.setItem('userId', decoded._id);
+        await AsyncStorage.setItem('userData', JSON.stringify(decoded));
+        setIsLoading(false);
+        router.replace('/profile');
+      } else {
+        throw new Error('Geçersiz token alındı.');
+      }
+
+    } catch (err: any) {
       setIsLoading(false);
-    }, 2000);
+      const errorMessage = err.response?.data?.status || err.response?.data?.error || 'Kayıt başarısız. Lütfen tekrar deneyin.';
+      Alert.alert('Hata', errorMessage);
+    }
   };
 
   return (
@@ -34,7 +60,7 @@ export default function RegisterScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         
         {/* Üst Başlık */}
         <View style={styles.headerContainer}>
