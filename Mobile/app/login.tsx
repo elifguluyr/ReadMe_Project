@@ -9,8 +9,11 @@ import {
   Platform,
   ActivityIndicator,
   Image,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authAPI, decodeJWT } from '../services/api';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -20,21 +23,38 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setIsLoading(true);
     setError('');
 
-    // 2 saniyelik sahte bekleme süresi (API simülasyonu)
-    setTimeout(() => {
-      if (email && password) {
-        alert('Giriş Başarılı! (Şimdilik sadece arayüz)');
-        setIsLoading(false);
-        // İleride buraya navigasyon kodu gelecek: router.push('/profile')
-      } else {
+    try {
+      if (!email || !password) {
         setError('Lütfen e-posta ve şifre giriniz.');
         setIsLoading(false);
+        return;
       }
-    }, 2000);
+
+      const data = await authAPI.login(email, password);
+      
+      const token = data.token;
+      await AsyncStorage.setItem('userToken', token);
+      
+      const decoded = decodeJWT(token);
+      if (decoded && decoded._id) {
+        await AsyncStorage.setItem('userId', decoded._id);
+        await AsyncStorage.setItem('userData', JSON.stringify(decoded));
+        setIsLoading(false);
+        router.replace('/search');
+      } else {
+        throw new Error('Geçersiz token alındı.');
+      }
+
+    } catch (err: any) {
+      setIsLoading(false);
+      const errorMessage = err.response?.data?.status || err.message || 'Giriş başarısız.';
+      setError(errorMessage);
+      Alert.alert('Hata', errorMessage);
+    }
   };
 
   return (
@@ -117,13 +137,6 @@ export default function LoginScreen() {
           <TouchableOpacity onPress={() => router.push('/register')}>
             <Text style={styles.signupText}>Hemen Kaydol</Text>
           </TouchableOpacity>
-
-          {/* GELİŞTİRİCİ KESTİRMESİ - SONRA SİLİNECEK */}
-        <TouchableOpacity 
-        style={{ marginTop: 20, padding: 10, backgroundColor: '#E5E7EB', borderRadius: 10, alignItems: 'center' }}
-        onPress={() => router.push('/search')}>
-          <Text style={{ color: '#4B5563', fontWeight: 'bold' }}>🚀 Test: Profile Direkt Geç</Text>
-        </TouchableOpacity>
 
         </View>
       </View>

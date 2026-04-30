@@ -8,10 +8,12 @@ import {
   FlatList, 
   TouchableOpacity,
   Dimensions,
-  Image
+  Image,
+  Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { bookAPI } from '../services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -19,13 +21,6 @@ export default function SearchScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Sahte veri: Arama yapılmadığında veya sonuç olarak gösterilecek kitaplar
-  interface Book {
-  id: string;
-  title: string;
-  author: string;
-  color: string;
-}
   const mockBooks = [
     { id: '1', title: 'Suç ve Ceza', author: 'Dostoyevski', color: '#1E3A8A' },
     { id: '2', title: 'Dune', author: 'Frank Herbert', color: '#8FBC8F' },
@@ -35,9 +30,27 @@ export default function SearchScreen() {
     { id: '6', title: 'Fahrenheit 451', author: 'Ray Bradbury', color: '#1E3A8A' },
   ];
 
-  const renderBook = ({ item }: { item: Book }) => (
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    try {
+      const results = await bookAPI.search(searchQuery);
+      
+      // Arkadaşın listelemeyi yapana kadar sadece çalıştığını Alert ile gösteriyoruz
+      console.log('Arama Sonuçları:', results);
+      Alert.alert(
+        'Arama Bağlantısı Başarılı! ✅', 
+        `Backend'den ${results.length} adet kitap sonucu döndü.\n(Kitap detayları terminal konsoluna yazdırıldı, listeleme işini arkadaşınız devralabilir.)`
+      );
+    } catch (error) {
+      console.error('Arama hatası:', error);
+      Alert.alert('Hata ❌', 'Arama yapılırken bir sorun oluştu. Lütfen tekrar deneyin.');
+    }
+  };
+
+  const renderBook = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.bookCard}>
-      <View style={[styles.bookCover, { backgroundColor: item.color }]}>
+      <View style={[styles.bookCover, { backgroundColor: item.color || '#354c79' }]}>
         <Text style={styles.bookCoverText}>{item.title[0]}</Text>
       </View>
       <Text style={styles.bookTitle} numberOfLines={1}>{item.title}</Text>
@@ -63,6 +76,8 @@ export default function SearchScreen() {
             placeholderTextColor="#263a62"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+            returnKeyType="search"
           />
         </View>
       </View>
@@ -80,7 +95,7 @@ export default function SearchScreen() {
           numColumns={2}
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={styles.row}
-          contentContainerStyle={{ paddingBottom: 20 }} // Alt menüye yapışmasın diye boşluk
+          contentContainerStyle={{ paddingBottom: 20 }}
         />
       </View>
 
@@ -129,7 +144,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', 
     alignItems: 'center', 
     gap: 6,
-    backgroundColor: '#bbc7debc',
+    backgroundColor: '#c0e2dcbc',
     borderRadius: 15,
     paddingHorizontal: 15,
     height: 50,
@@ -151,12 +166,23 @@ const styles = StyleSheet.create({
     width: '100%', 
     height: 180, 
     borderRadius: 12, 
-    justifyContent: 'center', 
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 3
+    elevation: 3,
+    backgroundColor: '#fff'
+  },
+  coverImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12
+  },
+  coverPlaceholder: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   bookCoverText: { color: '#FFFFFF', fontSize: 40, fontWeight: 'bold', opacity: 0.8 },
   bookTitle: { fontSize: 14, fontWeight: 'bold', color: '#1F2937', marginTop: 10, textAlign: 'center' },
