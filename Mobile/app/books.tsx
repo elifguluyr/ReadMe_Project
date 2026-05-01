@@ -156,8 +156,10 @@ export default function BooksScreen() {
       Alert.alert('Başarılı', 'Kitap rafa eklendi!');
       setIsSearchModalVisible(false);
       fetchData(); // re-fetch to show the new book in the shelf
-    } catch (error) {
-      Alert.alert('Hata', 'Kitap rafa eklenemedi.');
+    } catch (error: any) {
+      const errMsg = error.response?.data?.message || '';
+      const errDetail = error.response?.data?.error || error.message;
+      Alert.alert('Hata', `Kitap rafa eklenemedi: ${errMsg} - ${errDetail}`);
     }
   };
 
