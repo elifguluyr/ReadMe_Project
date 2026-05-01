@@ -1,15 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  SafeAreaView, 
-  TextInput, 
-  FlatList, 
-  TouchableOpacity,
-  Dimensions,
-  Image,
-  Alert
+  View, Text, StyleSheet, SafeAreaView, TextInput, FlatList, 
+  TouchableOpacity, Dimensions, Image, ActivityIndicator, Keyboard 
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
@@ -20,47 +12,75 @@ const { width } = Dimensions.get('window');
 export default function SearchScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const mockBooks = [
-    { id: '1', title: 'Suç ve Ceza', author: 'Dostoyevski', color: '#1E3A8A' },
-    { id: '2', title: 'Dune', author: 'Frank Herbert', color: '#8FBC8F' },
-    { id: '3', title: '1984', author: 'George Orwell', color: '#8B5A2B' },
-    { id: '4', title: 'Simyacı', author: 'Paulo Coelho', color: '#4A5D82' },
-    { id: '5', title: 'Körlük', author: 'Jose Saramago', color: '#0F766E' },
-    { id: '6', title: 'Fahrenheit 451', author: 'Ray Bradbury', color: '#1E3A8A' },
-  ];
+  const [books, setBooks] = useState([]); // Local DB books
+  const [searchResults, setSearchResults] = useState([]); // Google Books API results
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    
+  useEffect(() => {
+    fetchInitialBooks();
+  }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
+  const fetchInitialBooks = async () => {
+    setIsLoading(true);
     try {
-      const results = await bookAPI.search(searchQuery);
-      
-      // Arkadaşın listelemeyi yapana kadar sadece çalıştığını Alert ile gösteriyoruz
-      console.log('Arama Sonuçları:', results);
-      Alert.alert(
-        'Arama Bağlantısı Başarılı! ✅', 
-        `Backend'den ${results.length} adet kitap sonucu döndü.\n(Kitap detayları terminal konsoluna yazdırıldı, listeleme işini arkadaşınız devralabilir.)`
-      );
+      const allBooks = await bookAPI.getAllBooks();
+      setBooks(allBooks);
     } catch (error) {
-      console.error('Arama hatası:', error);
-      Alert.alert('Hata ❌', 'Arama yapılırken bir sorun oluştu. Lütfen tekrar deneyin.');
+      console.error('Başlangıç verileri yüklenemedi:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const renderBook = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.bookCard}>
-      <View style={[styles.bookCover, { backgroundColor: item.color || '#354c79' }]}>
-        <Text style={styles.bookCoverText}>{item.title[0]}</Text>
+  const handleSearchSubmit = async () => {
+    if (!searchQuery.trim()) return;
+    Keyboard.dismiss();
+    setIsLoading(true);
+    try {
+      const results = await bookAPI.search(searchQuery);
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Arama hatası:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getBackgroundColor = (index: number) => {
+    const colors = ['#1E3A8A', '#8FBC8F', '#8B5A2B', '#4A5D82', '#0F766E', '#704f4a'];
+    return colors[index % colors.length];
+  };
+
+  const renderBook = ({ item, index }: { item: any, index: number }) => {
+    const author = item.authors ? item.authors[0] : item.author;
+    
+    return (
+      <View style={styles.bookCard}>
+        <View style={[styles.bookCover, { backgroundColor: getBackgroundColor(index), overflow: 'hidden' }]}>
+          {item.imageLinks?.thumbnail ? (
+            <Image source={{ uri: item.imageLinks.thumbnail }} style={styles.coverImage} />
+          ) : (
+            <View style={styles.coverPlaceholder}>
+              <Text style={styles.bookCoverText}>{item.title ? item.title[0].toUpperCase() : '?'}</Text>
+            </View>
+          )}
+        </View>
+        <Text style={styles.bookTitle} numberOfLines={1}>{item.title || 'İsimsiz'}</Text>
+        <Text style={styles.bookAuthor} numberOfLines={1}>{author || 'Bilinmiyor'}</Text>
       </View>
-      <Text style={styles.bookTitle} numberOfLines={1}>{item.title}</Text>
-      <Text style={styles.bookAuthor} numberOfLines={1}>{item.author}</Text>
-    </TouchableOpacity>
-  );
+    );
+  };
+
+  const displayData = searchQuery.trim().length > 0 ? searchResults : books;
 
   return (
     <SafeAreaView style={styles.container}>
-      
       {/* ARAMA BAŞLIĞI VE ÇUBUĞU */}
       <View style={styles.searchHeader}>
         <Image 
@@ -72,60 +92,56 @@ export default function SearchScreen() {
           <FontAwesome name="search" size={24} color="#704f4a" style={{ marginBottom: 4 }} />
           <TextInput 
             style={styles.searchInput}
-            placeholder="Kitap, yazar veya tür ara..."
+            placeholder="Kitap veya yazar ara (Tüm Dünya)..."
             placeholderTextColor="#263a62"
             value={searchQuery}
             onChangeText={setSearchQuery}
-            onSubmitEditing={handleSearch}
+            onSubmitEditing={handleSearchSubmit}
             returnKeyType="search"
           />
         </View>
       </View>
 
-      {/* KÜTÜPHANE / SONUÇLAR IZGARASI (GRID) */}
+      {/* SONUÇLAR IZGARASI */}
       <View style={styles.listSection}>
         <Text style={styles.listTitle}>
-          {searchQuery.length > 0 ? `"${searchQuery}" sonuçları` : 'Popüler Kitaplar'}
+          {searchQuery.trim().length > 0 ? `Arama Sonuçları` : 'Tüm Kitaplar'}
         </Text>
         
-        <FlatList
-          data={mockBooks}
-          renderItem={renderBook}
-          keyExtractor={item => item.id}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        />
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#704f4a" style={{ marginTop: 50 }} />
+        ) : (
+          <FlatList
+            data={displayData}
+            renderItem={renderBook}
+            keyExtractor={(item, idx) => item._id || item.googleId || item.id || idx.toString()}
+            numColumns={2}
+            showsVerticalScrollIndicator={false}
+            columnWrapperStyle={styles.row}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            ListEmptyComponent={<Text style={{textAlign: 'center', color: '#6B7280'}}>Kitap bulunamadı.</Text>}
+          />
+        )}
       </View>
 
-      {/* ALT MENÜ  */}
+      {/* ALT MENÜ */}
       <View style={styles.bottomNav}>
-
-        {/* Arama */}
         <TouchableOpacity style={styles.navItem} onPress={() => {}}>
           <Ionicons name="search" size={24} color="#704f4a" style={{ marginBottom: 4 }} />
           <Text style={styles.navTextActive}>Arama</Text>
         </TouchableOpacity>
-
-        {/* Sosyal */}
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/social')}>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.replace('/social')}>
           <Ionicons name="chatbubbles-outline" size={24} color="#9CA3AF" style={{ marginBottom: 4 }} />
           <Text style={styles.navText}>Sosyal</Text>
         </TouchableOpacity>
-
-        {/* Kitaplık */}
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/books')}>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.replace('/books')}>
           <Ionicons name="library-outline" size={24} color="#9CA3AF" style={{ marginBottom: 4 }} />
           <Text style={styles.navText}>Kitaplık</Text>
         </TouchableOpacity>
-
-        {/* Profil */}
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/profile')}>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.replace('/profile')}>
           <Ionicons name="person-outline" size={24} color="#9CA3AF" style={{ marginBottom: 4 }} />
           <Text style={styles.navText}>Profil</Text>
         </TouchableOpacity>
-        
       </View>
     </SafeAreaView>
   );
@@ -133,85 +149,22 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FDFBF7' },
-  searchHeader: { 
-    padding: 20, 
-    backgroundColor: '#F9F6F0', 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#E5E7EB' 
-  },
-  searchBarContainer: { 
-    marginTop: -30,
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    gap: 6,
-    backgroundColor: '#c0e2dcbc',
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    height: 50,
-    
-  },
-  searchIcon: { fontSize: 18, marginRight: 10 },
-  searchInput: { flex: 1, fontSize: 16, color: '#1F2937' },
-
+  searchHeader: { padding: 20, backgroundColor: '#F9F6F0', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
+  searchBarContainer: { marginTop: -30, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#c0e2dcbc', borderRadius: 15, paddingHorizontal: 15, height: 50 },
+  searchInput: { flex: 1, fontSize: 15, color: '#1F2937' },
   listSection: { flex: 1, paddingHorizontal: 10, paddingTop: 20 },
   listTitle: { fontSize: 18, fontWeight: 'bold', color: '#1E3A8A', marginBottom: 15, marginLeft: 10 },
-  
   row: { justifyContent: 'space-between', paddingHorizontal: 10 },
-  bookCard: { 
-    width: (width / 2) - 30, 
-    marginBottom: 20,
-    alignItems: 'center'
-  },
-  bookCover: { 
-    width: '100%', 
-    height: 180, 
-    borderRadius: 12, 
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
-    backgroundColor: '#fff'
-  },
-  coverImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 12
-  },
-  coverPlaceholder: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
+  bookCard: { width: (width / 2) - 30, marginBottom: 20, alignItems: 'center' },
+  bookCover: { width: '100%', height: 180, borderRadius: 12, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 3 },
+  coverImage: { width: '100%', height: '100%', borderRadius: 12 },
+  coverPlaceholder: { width: '100%', height: '100%', borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   bookCoverText: { color: '#FFFFFF', fontSize: 40, fontWeight: 'bold', opacity: 0.8 },
-  bookTitle: { fontSize: 14, fontWeight: 'bold', color: '#1F2937', marginTop: 10, textAlign: 'center' },
-  bookAuthor: { fontSize: 12, color: '#6B7280', marginTop: 2, textAlign: 'center' },
-
-  // Alt Menü Stilleri
-  bottomNav: { 
-    flexDirection: 'row', 
-    backgroundColor: '#FFFFFF', 
-    paddingVertical: 15, 
-    paddingHorizontal: 10,
-    borderTopWidth: 1, 
-    borderTopColor: '#E5E7EB',
-    justifyContent: 'space-around',
-    alignItems: 'center'
-  },
+  bookTitle: { fontSize: 13, fontWeight: 'bold', color: '#1F2937', marginTop: 10, textAlign: 'center' },
+  bookAuthor: { fontSize: 11, color: '#6B7280', marginTop: 2, textAlign: 'center' },
+  bottomNav: { flexDirection: 'row', backgroundColor: '#FFFFFF', paddingVertical: 15, paddingHorizontal: 10, borderTopWidth: 1, borderTopColor: '#E5E7EB', justifyContent: 'space-around', alignItems: 'center' },
   navItem: { alignItems: 'center', flex: 1 },
-  navIcon: { fontSize: 20, opacity: 0.5, marginBottom: 4 },
-  navIconActive: { fontSize: 20, opacity: 1, marginBottom: 4 },
   navText: { fontSize: 10, color: '#6B7280', fontWeight: '500' },
   navTextActive: { fontSize: 10, color: '#704f4a', fontWeight: 'bold' },
-  searchLogo: {
-    width: 120,
-    height: 120,
-  },
-  headerLogo: {
-    width: 100,  
-    height: 100, 
-    marginTop: -30,    
-    marginBottom: -30,
-  },
+  searchLogo: { width: 120, height: 120 },
 });

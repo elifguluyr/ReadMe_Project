@@ -57,7 +57,7 @@ const addBookToShelf = async (req, res) => {
       await book.save();
     }
 
-    const updatedShelf = await Shelf.findByIdAndUpdate(
+    const updatedShelf = await Shelf.findOneAndUpdate(
       { _id: shelfId, user: userId },
       { $addToSet: { books: book._id } },
       { new: true }
@@ -83,7 +83,7 @@ const removeBookFromShelf = async (req, res) => {
   const userId = req.auth._id;
 
   try {
-    const updatedShelf = await Shelf.findByIdAndUpdate(
+    const updatedShelf = await Shelf.findOneAndUpdate(
       { _id: shelfId, user: userId },
       { $pull: { books: bookId } },
       { new: true }
