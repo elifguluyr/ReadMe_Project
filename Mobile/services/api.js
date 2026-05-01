@@ -87,4 +87,39 @@ export const bookAPI = {
   }
 };
 
+export const socialAPI = {
+  getPosts: async () => {
+    const response = await api.get('/paylasim');
+    return response.data;
+  },
+  createPost: async (content) => {
+    const response = await api.post('/paylasim', { postText: content });
+    return response.data;
+  },
+  deletePost: async (postId) => {
+    const response = await api.delete(`/paylasim/${postId}`);
+    return response.data;
+  },
+  toggleLike: async (postId) => {
+    const response = await api.post(`/paylasim/${postId}/begen`);
+    return response.data;
+  },
+  getComments: async (postId) => {
+    const response = await api.get(`/paylasim/${postId}/yorumlar`);
+    return response.data;
+  },
+  createComment: async (postId, text) => {
+    const response = await api.post(`/paylasim/${postId}/yorum`, { commentText: text });
+    return response.data;
+  },
+  updateComment: async (postId, commentId, text) => {
+    const response = await api.put(`/paylasim/${postId}/yorum/${commentId}`, { commentText: text });
+    return response.data;
+  },
+  deleteComment: async (postId, commentId) => {
+    const response = await api.delete(`/paylasim/${postId}/yorum/${commentId}`);
+    return response.data;
+  }
+};
+
 export default api;
