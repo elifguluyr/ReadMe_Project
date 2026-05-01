@@ -1,7 +1,71 @@
 const mongoose = require('mongoose');
 require('../models/paylasim'); 
 const Paylasim = mongoose.model('Paylasim');
+const redis = require('redis');
+const amqp = require('amqplib');
 
+// --- REDIS SETUP ---
+let redisClient = redis.createClient({
+    url: process.env.REDIS_URL || 'redis://127.0.0.1:6379'
+});
+redisClient.on('error', (err) => console.log('Redis Client Hatası:', err.message));
+redisClient.connect().catch(() => console.log("Redis'e bağlanılamadı, önbellekleme atlanacak."));
+
+// --- RABBITMQ SETUP ---
+let channel, connection;
+async function connectRabbitMQ() {
+    try {
+        const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://127.0.0.1';
+        connection = await amqp.connect(rabbitUrl);
+        channel = await connection.createChannel();
+        await channel.assertQueue('like-queue', { durable: true });
+        console.log("RabbitMQ 'like-queue' başarıyla bağlandı.");
+        
+        // Kuyrukta biriken beğeni mesajlarını dinleyip işliyoruz (Consumer)
+        channel.consume('like-queue', async (msg) => {
+            if (msg !== null) {
+                const data = JSON.parse(msg.content.toString());
+                await processLikeMessage(data.paylasimId, data.userId);
+                channel.ack(msg);
+            }
+        });
+    } catch (err) {
+        console.log("RabbitMQ bağlanılamadı, beğeni işlemleri veritabanına senkron yazılacak.", err.message);
+    }
+}
+connectRabbitMQ();
+
+async function processLikeMessage(paylasimId, userId) {
+    try {
+        const paylasim = await Paylasim.findById(paylasimId);
+        if (!paylasim) return;
+
+        paylasim.likedBy = paylasim.likedBy || [];
+        const likedByIds = paylasim.likedBy.map((id) => id.toString());
+        const alreadyLiked = likedByIds.includes(userId);
+
+        if (alreadyLiked) {
+            paylasim.likedBy = paylasim.likedBy.filter((id) => id.toString() !== userId);
+        } else {
+            paylasim.likedBy.push(userId);
+        }
+        await paylasim.save();
+        
+        // Veritabanı değiştiği için önbelleği (cache) temizliyoruz
+        if (redisClient.isReady) {
+            await redisClient.del('paylasimlar_cache');
+        }
+    } catch(err) {
+        console.error("Beğeni işlenirken hata:", err);
+    }
+}
+
+// Çeşitli modifikasyonlarda Cache temizleme yardımcı fonksiyonu
+const clearCache = async () => {
+    if (redisClient.isReady) {
+        await redisClient.del('paylasimlar_cache');
+    }
+}
 
 const paylasimYap = async (req, res) => {
     try {
@@ -11,20 +75,18 @@ const paylasimYap = async (req, res) => {
             date: new Date()
         });
         await yeniPaylasim.save();
+        await clearCache(); // Cache temizle
         res.status(201).json(yeniPaylasim);
     } catch (hata) {
         res.status(400).json({ mesaj: "Paylaşım oluşturulamadı", hata });
     }
 };
 
-
 const yorumYap = async (req, res) => {
     try {
         const paylasim = await Paylasim.findById(req.params.paylasimId);
+        if (!paylasim) return res.status(404).json({ mesaj: "Paylaşım bulunamadı" });
         
-        if (!paylasim) {
-            return res.status(404).json({ mesaj: "Paylaşım bulunamadı" });
-        }
         const yeniYorum = {
             ...req.body, 
             user: req.auth._id, 
@@ -32,12 +94,12 @@ const yorumYap = async (req, res) => {
         };
         paylasim.comments.push(yeniYorum);
         await paylasim.save();
+        await clearCache(); // Cache temizle
         res.status(201).json(yeniYorum);
     } catch (err) {
         res.status(400).json({ mesaj: "Yorum eklenemedi" });
     }
 };
-
 
 const paylasimSil = async (req, res) => {
     try {
@@ -46,6 +108,7 @@ const paylasimSil = async (req, res) => {
         if (!silinenPaylasim) {
             return res.status(404).json({ "mesaj": "Silinmek istenen paylaşım bulunamadı!" });
         }
+        await clearCache(); // Cache temizle
         res.status(200).json({
             "mesaj": "Paylaşım ve ona bağlı tüm yorumlar başarıyla silindi.",
             "silinenVeri": silinenPaylasim
@@ -55,61 +118,43 @@ const paylasimSil = async (req, res) => {
     }
 };
 
-
 const yorumSil = async (req, res) => {
     try {
         const { paylasimId, yorumId } = req.params;
         const paylasim = await Paylasim.findById(paylasimId);
-        if (!paylasim) {
-            return res.status(404).json({ mesaj: "Paylaşım bulunamadı!" });
-        }
+        if (!paylasim) return res.status(404).json({ mesaj: "Paylaşım bulunamadı!" });
+        
         const yorum = paylasim.comments.id(yorumId);
-        if (!yorum) {
-            return res.status(404).json({ mesaj: "Böyle bir yorum zaten yok!" });
-        }
+        if (!yorum) return res.status(404).json({ mesaj: "Böyle bir yorum zaten yok!" });
+        
         yorum.deleteOne();
         await paylasim.save();
+        await clearCache(); // Cache temizle
         res.status(200).json({ mesaj: "Yorum başarıyla silindi", paylasim });
     } catch (hata) {
         res.status(400).json({ mesaj: "Silme işlemi başarısız", hata: hata.message });
     }
 };
 
-
-
+// BEĞENME (RabbitMQ Entegrasyonu)
 const begen = async (req, res) => {
     try {
-        const paylasim = await Paylasim.findById(req.params.paylasimId);
-        if (!paylasim) {
-            return res.status(404).json({ mesaj: "Paylaşım bulunamadı" });
-        }
-
         const userId = req.auth._id.toString();
-        paylasim.likedBy = paylasim.likedBy || [];
-        const likedByIds = paylasim.likedBy.map((id) => id.toString());
-        const alreadyLiked = likedByIds.includes(userId);
+        const paylasimId = req.params.paylasimId;
 
-        if (alreadyLiked) {
-            paylasim.likedBy = paylasim.likedBy.filter((id) => id.toString() !== userId);
+        // RabbitMQ hazırsa işi kuyruğa atıp anında cevap dönüyoruz (Asenkron işleme)
+        if (channel) {
+            channel.sendToQueue('like-queue', Buffer.from(JSON.stringify({ paylasimId, userId })));
+            return res.status(202).json({ mesaj: "Beğeni işlemi kuyruğa alındı (RabbitMQ)." });
         } else {
-            paylasim.likedBy.push(req.auth._id);
+            // Eğer RabbitMQ yoksa direkt MongoDB'ye kaydet (Fallback)
+            await processLikeMessage(paylasimId, userId);
+            return res.status(200).json({ mesaj: "Beğeni işlemi başarıyla tamamlandı (Senkron)." });
         }
-
-        await paylasim.save();
-        const populatedPaylasim = await paylasim
-            .populate({ path: 'user', model: 'user', select: 'name email profileImage' })
-            .execPopulate?.() || await paylasim.populate({ path: 'user', model: 'user', select: 'name email profileImage' });
-        const responsePayload = {
-            ...populatedPaylasim.toObject(),
-            likes: populatedPaylasim.likedBy.length,
-        };
-
-        res.status(200).json(responsePayload);
     } catch (hata) {
-        res.status(400).json({ mesaj: "Beğenme işlemi başarısız", hata: hata.message });
+        res.status(400).json({ mesaj: "Beğenme isteği işlenemedi", hata: hata.message });
     }
 };
-
 
 const yorumGuncelle = async (req, res) => {
     try {
@@ -118,15 +163,14 @@ const yorumGuncelle = async (req, res) => {
         
         if (!yorum) return res.status(404).json({ mesaj: "Yorum bulunamadı" });
 
-        yorum.commentText = req.body.commentText; // Yeni şema alan adın
+        yorum.commentText = req.body.commentText; 
         await paylasim.save();
+        await clearCache(); // Cache temizle
         res.status(200).json(paylasim);
     } catch (hata) {
         res.status(400).json({ mesaj: "Güncelleme başarısız", hata: hata.message });
     }
 };
-
-
 
 const yorumlariListele = async (req, res) => {
     try {
@@ -157,9 +201,21 @@ const paylasimGetir = async (req, res) => {
         res.status(400).json({ mesaj: "ID formatı geçersiz", hata: hata.message });
     }
 };
+
+// PAYLAŞIMLARI LİSTELEME (Redis Cache Entegrasyonu)
 const paylasimlariListele = async (req, res) => {
     try {
-        console.log("Paylaşımları listeleme isteği geldi..."); // Terminale bakmak için
+        // 1. Önbellekte veri varsa, direkt onu dön
+        if (redisClient.isReady) {
+            const cachedPosts = await redisClient.get('paylasimlar_cache');
+            if (cachedPosts) {
+                console.log("Redis Cache HIT: Paylaşımlar önbellekten getirildi.");
+                return res.status(200).json(JSON.parse(cachedPosts));
+            }
+        }
+
+        // 2. Yoksa veritabanından çek
+        console.log("Redis Cache MISS: Veritabanından paylaşımlar sorgulanıyor...");
         const paylasimlar = await Paylasim.find()
             .populate({ path: 'user', model: 'user', select: 'name email profileImage' })
             .populate({ path: 'comments.user', model: 'user', select: 'name' })
@@ -169,15 +225,16 @@ const paylasimlariListele = async (req, res) => {
             return res.status(200).json({ mesaj: "Henüz hiç paylaşım yapılmamış.", veri: [] });
         }
 
+        // 3. Çekilen veriyi 1 saatliğine (3600 sn) Redis'e kaydet
+        if (redisClient.isReady) {
+            await redisClient.setEx('paylasimlar_cache', 3600, JSON.stringify(paylasimlar));
+        }
+
         res.status(200).json(paylasimlar);
     } catch (hata) {
-        console.error("Hata Detayı:", hata); // Hatayı terminalde gör
+        console.error("Hata Detayı:", hata); 
         res.status(400).json({ mesaj: "Paylaşımlar listelenirken hata oluştu", hata: hata.message });
     }
 };
-
-
 module.exports = { paylasimYap, yorumYap, paylasimSil, yorumSil, begen, yorumGuncelle, yorumlariListele, paylasimGetir, paylasimlariListele };
-
-
 
