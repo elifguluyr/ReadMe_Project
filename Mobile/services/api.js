@@ -6,7 +6,7 @@ const API_URL = 'https://readme-api-m7pb.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 60000, 
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -83,6 +83,49 @@ export const userAPI = {
 export const bookAPI = {
   search: async (query) => {
     const response = await api.get(`/books/search?q=${encodeURIComponent(query)}`);
+    return response.data;
+  },
+  getAllBooks: async () => {
+    const response = await api.get('/books');
+    return response.data;
+  }
+};
+
+export const ratingAPI = {
+  addRating: async (bookId, rating) => {
+    const response = await api.post('/ratings', { bookId, rating });
+    return response.data;
+  },
+  updateRating: async (ratingId, rating) => {
+    const response = await api.put(`/ratings/${ratingId}`, { rating });
+    return response.data;
+  },
+  deleteRating: async (ratingId) => {
+    const response = await api.delete(`/ratings/${ratingId}`);
+    return response.data;
+  },
+  getUserRatings: async () => {
+    try {
+      const response = await api.get('/ratings/user');
+      return response.data;
+    } catch (error) {
+      console.warn("Puanlar çekilemedi, backend güncellenmemiş olabilir:", error.message);
+      return [];
+    }
+  }
+};
+
+export const shelfAPI = {
+  createShelf: async (name) => {
+    const response = await api.post('/shelves', { name });
+    return response.data;
+  },
+  addBookToShelf: async (shelfId, bookData) => {
+    const response = await api.post(`/shelves/${shelfId}/books`, bookData);
+    return response.data;
+  },
+  removeBookFromShelf: async (shelfId, bookId) => {
+    const response = await api.delete(`/shelves/${shelfId}/books/${bookId}`);
     return response.data;
   }
 };
