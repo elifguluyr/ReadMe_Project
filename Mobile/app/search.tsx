@@ -9,11 +9,23 @@ import { bookAPI } from '../services/api';
 
 const { width } = Dimensions.get('window');
 
+interface Book {
+  _id?: string;
+  id?: string;
+  googleId?: string;
+  title: string;
+  author?: string;
+  authors?: string[];
+  imageLinks?: {
+    thumbnail?: string;
+  };
+}
+
 export default function SearchScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [books, setBooks] = useState([]); // Local DB books
-  const [searchResults, setSearchResults] = useState([]); // Google Books API results
+  const [books, setBooks] = useState<Book[]>([]); // Local DB books
+  const [searchResults, setSearchResults] = useState<Book[]>([]); // Google Books API results
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -57,7 +69,7 @@ export default function SearchScreen() {
     return colors[index % colors.length];
   };
 
-  const renderBook = ({ item, index }: { item: any, index: number }) => {
+  const renderBook = ({ item, index }: { item: Book, index: number }) => {
     const author = item.authors ? item.authors[0] : item.author;
     
     return (

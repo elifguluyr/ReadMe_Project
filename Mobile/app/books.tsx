@@ -10,11 +10,35 @@ import { userAPI, bookAPI, shelfAPI, ratingAPI } from '../services/api';
 
 const { width } = Dimensions.get('window');
 
+interface Book {
+  _id?: string;
+  id?: string;
+  googleId?: string;
+  title: string;
+  author?: string;
+  authors?: string[];
+  imageLinks?: {
+    thumbnail?: string;
+  };
+}
+
+interface Shelf {
+  _id: string;
+  name: string;
+  books?: any[];
+}
+
+interface Rating {
+  _id: string;
+  bookId: string;
+  rating: number;
+}
+
 export default function BooksScreen() {
   const router = useRouter();
-  const [shelves, setShelves] = useState([]);
-  const [allBooks, setAllBooks] = useState([]);
-  const [userRatings, setUserRatings] = useState([]);
+  const [shelves, setShelves] = useState<Shelf[]>([]);
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [userRatings, setUserRatings] = useState<Rating[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   const [isAddShelfModalVisible, setAddShelfModalVisible] = useState(false);
@@ -22,14 +46,14 @@ export default function BooksScreen() {
 
   // Book Action (Rating) Modal States
   const [isBookModalVisible, setIsBookModalVisible] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [currentRating, setCurrentRating] = useState(0);
 
   // Add Book To Shelf Modal States
   const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
   const [selectedShelfForAdd, setSelectedShelfForAdd] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<Book[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
@@ -83,7 +107,7 @@ export default function BooksScreen() {
     }
   };
 
-  const openBookModal = (book: any) => {
+  const openBookModal = (book: Book) => {
     setSelectedBook(book);
     const bId = book._id || book.id || book.googleId;
     const existingRating = userRatings.find((r: any) => r.bookId === bId);
@@ -143,7 +167,7 @@ export default function BooksScreen() {
     }
   };
 
-  const handleAddSearchedBookToShelf = async (book: any) => {
+  const handleAddSearchedBookToShelf = async (book: Book) => {
     if (!selectedShelfForAdd) return;
     try {
       const bookData = {
@@ -169,7 +193,7 @@ export default function BooksScreen() {
   };
 
   const renderBook = (bookId: string, shelfId: string, index: number) => {
-    const book = allBooks.find((b: any) => b._id === bookId || b.id === bookId);
+    const book = allBooks.find((b: Book) => b._id === bookId || b.id === bookId);
     if (!book) return null;
 
     return (
@@ -196,7 +220,7 @@ export default function BooksScreen() {
     );
   };
 
-  const renderSearchedBook = ({ item, index }: { item: any, index: number }) => {
+  const renderSearchedBook = ({ item, index }: { item: Book, index: number }) => {
     const author = item.authors ? item.authors[0] : item.author;
     return (
       <TouchableOpacity style={styles.searchResultCard} onPress={() => handleAddSearchedBookToShelf(item)}>
@@ -236,7 +260,7 @@ export default function BooksScreen() {
     );
   };
 
-  const renderShelf = ({ item }: { item: any }) => {
+  const renderShelf = ({ item }: { item: Shelf }) => {
     return (
       <View style={styles.shelfContainer}>
         <View style={styles.shelfHeader}>
