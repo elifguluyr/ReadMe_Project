@@ -377,6 +377,8 @@ export default function BooksScreen() {
                 renderItem={renderSearchedBook}
                 keyExtractor={(item, idx) => item._id || item.googleId || item.id || idx.toString()}
                 contentContainerStyle={{ padding: 15 }}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
                 ListEmptyComponent={
                   searchQuery.length > 0 ? (
                     <Text style={{textAlign: 'center', color: '#6B7280', marginTop: 20}}>Sonuç bulunamadı.</Text>

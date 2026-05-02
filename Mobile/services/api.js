@@ -6,7 +6,7 @@ const API_URL = 'https://readme-api-m7pb.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 60000, 
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   }

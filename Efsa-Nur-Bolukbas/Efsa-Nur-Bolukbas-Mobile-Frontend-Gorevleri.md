@@ -1,5 +1,5 @@
 # Efsa Nur Bölükbaş'ın Mobil Frontend Görevleri
-**Mobile Front-end Demo Videosu:** [Link buraya eklenecek](https://example.com)
+**Mobile Front-end Demo Videosu:** (https://youtube.com/shorts/qq99UhRzx8A)
 
 ## 1. Kitaplık (Library) Sayfası ve Raflar
 - **API Endpoint:** `GET /profile/{userId}`, `GET /books`

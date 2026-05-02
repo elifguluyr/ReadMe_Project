@@ -119,6 +119,8 @@ export default function SearchScreen() {
             showsVerticalScrollIndicator={false}
             columnWrapperStyle={styles.row}
             contentContainerStyle={{ paddingBottom: 20 }}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
             ListEmptyComponent={<Text style={{textAlign: 'center', color: '#6B7280'}}>Kitap bulunamadı.</Text>}
           />
         )}
