@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node --env-file=.env ./bin/www",
+    "start": "node ./bin/www",
+    "dev": "node --env-file=.env ./bin/www",
     "stop": "npx kill-port 3000"
   },
   "dependencies": {
