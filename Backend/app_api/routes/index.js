@@ -42,7 +42,7 @@ router.delete('/delete', auth, ctrlUser.deleteAccount);
 
 
 //efsanın router kısmı
-router.use("/", bookRoutes);
+router.use("/books", bookRoutes);
 router.use("/ratings", auth,ratingRoutes);
 router.use("/shelves", auth, shelfRoutes);
 
