@@ -57,8 +57,11 @@ export default function SearchScreen() {
     try {
       const results = await bookAPI.search(searchQuery);
       setSearchResults(results);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Arama hatası:', error);
+      if (error.response?.data) {
+        console.error('Hata Detayları:', error.response.data);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +107,7 @@ export default function SearchScreen() {
           <FontAwesome name="search" size={24} color="#704f4a" style={{ marginBottom: 4 }} />
           <TextInput 
             style={styles.searchInput}
-            placeholder="Kitap veya yazar ara (Tüm Dünya)..."
+            placeholder="Kitap ara"
             placeholderTextColor="#263a62"
             value={searchQuery}
             onChangeText={setSearchQuery}
