@@ -1,41 +1,101 @@
 # Efsa Nur Bölükbaş'ın Mobil Backend Görevleri
-**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek](https://example.com)
+**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** (https://youtu.be/Kjxd4wspJ2w)
 
-## 1. Kitaplık ve Raf Yönetimi Servisi
-- **API Endpoint:** `POST /shelves`, `POST /shelves/{shelfId}/books`, `DELETE /shelves/{shelfId}/books/{bookId}`
-- **Görev:** Mobil uygulamada kullanıcının raf oluşturmasını, kitap eklemesini ve silmesini sağlayan servis entegrasyonlarının gerçekleştirilmesi
+## 1. Kitap Listeleme Servisi
+- **API Endpoint:** `GET /books`
+- **Görev:** Mobil uygulamada sistemde kayıtlı kitapları listeleyen servis entegrasyonu
 - **İşlevler:**
-  - JWT token üzerinden kimlik doğrulama (`req.auth._id` kullanımı)
-  - `POST /shelves`: Yeni raf oluşturup kullanıcının `shelf` referans dizisine MongoDB üzerinden ekleme yapılması
-  - `POST /shelves/{shelfId}/books`: Google Books API'den gelen kitabın yerel veritabanında (Local DB) olup olmadığını kontrol etme, yoksa yeni `Book` modeli oluşturma ve rafa entegre etme (googleId ile benzersizlik kontrolü)
-  - `DELETE /shelves/{shelfId}/books/{bookId}`: Seçili kitabı rafın kitaplar listesinden (`$pull` operatörü ile) çıkarma ve anlık silme işlemini yapma
+  - Mobil uygulamadan kitap listesini çekme
+  - API'ye GET isteği gönderme
+  - Gelen kitap verilerini liste formatında kullanma
+  - Kitap başlığı, yazar ve kapak görseli gibi bilgileri alma
+  - Hata durumlarını yakalama ve kullanıcıya gösterme
 - **Teknik Detaylar:**
-  - HTTP Client kullanımı (Axios) ile Backend'e bağlanma
-  - Request body ve URL parametrelerinin işlenerek controller metodlarına aktarımı
-  - Mongoose `findOneAndUpdate` optimizasyonlarıyla `CastError` bug'larının çözülmesi
-  - Error handling mekanizması (404 Not Found, 400 Bad Request, 500 Internal Server Error) ve bu hataların mobil tarafa fırlatılması
+  - Axios HTTP client kullanımı
+  - `bookAPI.getAllBooks()` fonksiyonu ile istek gönderme
+  - Response verisini parse etme
+  - Loading state ve error handling yönetimi
 
-## 2. Kitap Puanlama (Rating) Servisi
-- **API Endpoint:** `GET /ratings/user`, `POST /ratings`, `PUT /ratings/{ratingId}`, `DELETE /ratings/{ratingId}`
-- **Görev:** Kullanıcının kitaplara verdiği puanların CRUD (Create, Read, Update, Delete) işlemlerini uçtan uca gerçekleştiren servis entegrasyonu
+## 2. Raf Ekleme Servisi
+- **API Endpoint:** `POST /shelves`
+- **Görev:** Mobil uygulamada kullanıcının yeni raf oluşturmasını sağlayan servis entegrasyonu
 - **İşlevler:**
-  - `GET /ratings/user`: Kullanıcının geçmişte verdiği tüm puanları getirip mobil uygulamanın state'ine kaydetme
-  - `POST /ratings`: Kitaba verilen yeni 1-5 arası yıldızı API'ye POST isteğiyle kaydetme
-  - `PUT /ratings/{ratingId}`: Önceden verilmiş bir puanı yeni değerle değiştirme (Update)
-  - `DELETE /ratings/{ratingId}`: Mevcut puanlamayı sistemden tamamen silme (Delete)
+  - Kullanıcıdan raf adı bilgisini alma
+  - API'ye POST isteği gönderme
+  - Başarılı raf ekleme sonrası raf listesini güncelleme
+  - Hata durumlarını yakalama
 - **Teknik Detaylar:**
-  - Axios interceptor üzerinden tüm servislere otomatik `Authorization (Bearer Token)` header'ının eklenmesi
-  - Token süresi veya yetkisizlik durumlarında (401 Unauthorized) ile backend endpoint bulunamama (404 Not Found) durumlarında `try-catch` blokları ile güvenli hata yönetimi
-  - Yanıt (response) verilerinin parse edilip, frontend tarafındaki modal içerisinde aktif yıldızlara dinamik olarak dönüştürülmesi
+  - JWT token ile kimlik doğrulama
+  - Authorization header ekleme
+  - Request body oluşturma: `{ name }`
+  - `shelfAPI.createShelf(name)` fonksiyonu ile servis çağırma
 
-## 3. Küresel Kitap Arama (Google Books API) Servisi
-- **API Endpoint:** `GET /books/search?q={query}`
-- **Görev:** Mobil uygulamadan girilen kelimeleri Google Books API üzerinden aratıp sonuçları döndüren aracı servis (proxy) bağlantısının kurulması
+## 3. Rafa Kitap Ekleme Servisi
+- **API Endpoint:** `POST /shelves/{shelfId}/books`
+- **Görev:** Seçilen kitabı kullanıcının belirlediği rafa ekleyen servis entegrasyonu
 - **İşlevler:**
-  - Arama çubuğundan gelen veriyi URL kodlaması (`encodeURIComponent`) ile backend'e güvenli olarak iletme
-  - Backend üzerinden dönen karmaşık kitap datalarını (id, başlık, yazarlar, kapak resmi vb.) mobil tarafta kullanılabilir, temizlenmiş bir formata (`map`) getirme
-  - İstek sırasında uygulamanın "Loading" statüsünü yönetme
+  - Seçilen rafın ID bilgisini alma
+  - Eklenecek kitap bilgilerini toplama
+  - API'ye POST isteği gönderme
+  - Başarılı işlem sonrası kitabı ilgili rafta gösterme
 - **Teknik Detaylar:**
-  - Asenkron veri akışı (Promise yapısı ve async/await kullanımı)
-  - Google Books veri modelini MongoDB `Book` modeline uyarlama ve property formatlarını sabitleme
-  - API'den yanıt gelmemesi veya Timeout durumlarında Request/Response döngüsünün yakalanması
+  - Dinamik endpoint kullanımı
+  - Request body olarak kitap verisi gönderme
+  - `shelfAPI.addBookToShelf(shelfId, bookData)` fonksiyonu ile istek atma
+  - Error handling ve kullanıcı bildirimi
+
+## 4. Raftan Kitap Silme Servisi
+- **API Endpoint:** `DELETE /shelves/{shelfId}/books/{bookId}`
+- **Görev:** Kullanıcının seçtiği kitabı ilgili raftan silen servis entegrasyonu
+- **İşlevler:**
+  - Silinecek raf ve kitap ID bilgisini alma
+  - API'ye DELETE isteği gönderme
+  - Başarılı silme sonrası raf içeriğini güncelleme
+  - Kullanıcıya işlem sonucunu gösterme
+- **Teknik Detaylar:**
+  - Dinamik endpoint kullanımı
+  - `shelfAPI.removeBookFromShelf(shelfId, bookId)` fonksiyonu ile servis çağırma
+  - JWT token ile korumalı endpoint kullanımı
+  - Error handling yönetimi
+
+## 5. Puan Ekleme Servisi
+- **API Endpoint:** `POST /ratings`
+- **Görev:** Kullanıcının bir kitaba puan vermesini sağlayan servis entegrasyonu
+- **İşlevler:**
+  - Kitap ID ve puan bilgisini alma
+  - API'ye POST isteği gönderme
+  - Başarılı işlem sonrası puanı ekranda gösterme
+  - Hata durumlarını yakalama
+- **Teknik Detaylar:**
+  - Request body oluşturma: `{ bookId, rating }`
+  - `ratingAPI.addRating(bookId, rating)` fonksiyonu ile servis çağırma
+  - Authorization header ile token gönderme
+  - Loading ve error state yönetimi
+
+## 6. Puan Güncelleme Servisi
+- **API Endpoint:** `PUT /ratings/{ratingId}`
+- **Görev:** Kullanıcının daha önce verdiği puanı güncellemesini sağlayan servis entegrasyonu
+- **İşlevler:**
+  - Güncellenecek puan ID bilgisini alma
+  - Yeni puan değerini API'ye gönderme
+  - Başarılı güncelleme sonrası ekrandaki puanı yenileme
+  - Hata durumlarını kullanıcıya bildirme
+- **Teknik Detaylar:**
+  - Dinamik endpoint kullanımı
+  - Request body oluşturma: `{ rating }`
+  - `ratingAPI.updateRating(ratingId, rating)` fonksiyonu ile PUT isteği gönderme
+  - Error handling yönetimi
+
+## 7. Puan Silme Servisi
+- **API Endpoint:** `DELETE /ratings/{ratingId}`
+- **Görev:** Kullanıcının verdiği puanı silmesini sağlayan servis entegrasyonu
+- **İşlevler:**
+  - Silinecek puan ID bilgisini alma
+  - API'ye DELETE isteği gönderme
+  - Başarılı silme sonrası puanı ekrandan kaldırma
+  - Hata durumlarını yakalama
+- **Teknik Detaylar:**
+  - JWT token ile kimlik doğrulama
+  - `ratingAPI.deleteRating(ratingId)` fonksiyonu ile servis çağırma
+  - Dinamik endpoint yapısı
+  - Error handling ve kullanıcı bildirimi
