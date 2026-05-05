@@ -3,7 +3,7 @@ const router = express.Router();
 
 const bookController = require("../controllers/bookController");
 
-router.get('/books/search', bookController.searchBooks);
-router.get("/books", bookController.getBooks);
+router.get('/search', bookController.searchBooks);
+router.get("/", bookController.getBooks);
 
 module.exports = router;

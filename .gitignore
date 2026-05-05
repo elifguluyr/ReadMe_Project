@@ -1,7 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
-yarn.lock
 
 # Expo
 .expo/
@@ -10,10 +8,12 @@ web-build/
 
 # Backend specific
 Backend/node_modules/
+Backend/.env
 
 # OS files
 .DS_Store
 Thumbs.db
+.lock-wscript
 
 # Environment variables
 .env
