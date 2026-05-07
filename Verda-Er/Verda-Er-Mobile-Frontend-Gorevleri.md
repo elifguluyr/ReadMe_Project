@@ -1,5 +1,5 @@
 # Verda Er'in Mobil Frontend Görevleri
-**Mobile Front-end Demo Videosu:** [Link buraya eklenecek]
+**Mobile Front-end Demo Videosu:** (https://youtube.com/shorts/rt8lcLTSd8Q?feature=share)
 
 
 
