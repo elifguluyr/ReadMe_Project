@@ -1,5 +1,5 @@
 # Verda Er'in Mobil Backend Entegrasyon Görevleri
-**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek]
+**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** (https://youtu.be/4WinpVf6oik)
 
 
 
