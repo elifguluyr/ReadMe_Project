@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: readme_backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    # MongoDB Atlas kullanıldığı için burada MongoDB servisi başlatmıyoruz
+    # Ancak lokal MongoDB eklenecekse buraya eklenebilir.
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: readme_frontend
+    ports:
+      - "8080:80" # Frontend 8080 portundan yayın yapacak
+    depends_on:
+      - backend
+    restart: unless-stopped
