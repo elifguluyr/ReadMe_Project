@@ -63,14 +63,10 @@ jobs:
         cache: 'npm'
         cache-dependency-path: Mobile/package-lock.json
         
-    - name: Install Expo CLI
-      run: npm install -g expo-cli
-      
     - name: Install dependencies (Mobile)
       working-directory: ./Mobile
-      run: npm ci
+      run: npm install
       
     - name: Expo Export (Test Build)
       working-directory: ./Mobile
       run: npx expo export --platform web
-      # Web için export almak uygulamanın derlenebildiğinin iyi bir kanıtıdır.
