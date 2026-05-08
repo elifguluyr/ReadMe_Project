@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, StyleSheet, SafeAreaView, TextInput, FlatList, 
-  TouchableOpacity, Dimensions, Image, ActivityIndicator, Keyboard 
+import {
+  View, Text, StyleSheet, TextInput, FlatList,
+  TouchableOpacity, Dimensions, Image, ActivityIndicator, Keyboard
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { bookAPI } from '../services/api';
@@ -74,7 +75,7 @@ export default function SearchScreen() {
 
   const renderBook = ({ item, index }: { item: Book, index: number }) => {
     const author = item.authors ? item.authors[0] : item.author;
-    
+
     return (
       <View style={styles.bookCard}>
         <View style={[styles.bookCover, { backgroundColor: getBackgroundColor(index), overflow: 'hidden' }]}>
@@ -98,14 +99,14 @@ export default function SearchScreen() {
     <SafeAreaView style={styles.container}>
       {/* ARAMA BAŞLIĞI VE ÇUBUĞU */}
       <View style={styles.searchHeader}>
-        <Image 
-            source={require('../assets/images/icon.png')} 
-            style={styles.searchLogo} 
-            resizeMode="contain" 
-          />
+        <Image
+          source={require('../assets/images/icon.png')}
+          style={styles.searchLogo}
+          resizeMode="contain"
+        />
         <View style={styles.searchBarContainer}>
           <FontAwesome name="search" size={24} color="#704f4a" style={{ marginBottom: 4 }} />
-          <TextInput 
+          <TextInput
             style={styles.searchInput}
             placeholder="Kitap ara"
             placeholderTextColor="#263a62"
@@ -122,7 +123,7 @@ export default function SearchScreen() {
         <Text style={styles.listTitle}>
           {searchQuery.trim().length > 0 ? `Arama Sonuçları` : 'Tüm Kitaplar'}
         </Text>
-        
+
         {isLoading ? (
           <ActivityIndicator size="large" color="#704f4a" style={{ marginTop: 50 }} />
         ) : (
@@ -136,14 +137,14 @@ export default function SearchScreen() {
             contentContainerStyle={{ paddingBottom: 20 }}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
-            ListEmptyComponent={<Text style={{textAlign: 'center', color: '#6B7280'}}>Kitap bulunamadı.</Text>}
+            ListEmptyComponent={<Text style={{ textAlign: 'center', color: '#6B7280' }}>Kitap bulunamadı.</Text>}
           />
         )}
       </View>
 
       {/* ALT MENÜ */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={() => {}}>
+        <TouchableOpacity style={styles.navItem} onPress={() => { }}>
           <Ionicons name="search" size={24} color="#704f4a" style={{ marginBottom: 4 }} />
           <Text style={styles.navTextActive}>Arama</Text>
         </TouchableOpacity>
