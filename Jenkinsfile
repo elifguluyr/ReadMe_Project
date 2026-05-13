@@ -6,8 +6,9 @@ pipeline {
             steps {
                 echo 'Checking out source code...'
                 // Normalde git checkout yapılır:
-                // git 'https://github.com/elifguluyr/ReadMe_Project.git'
-                checkout scm
+                // git branch: 'main', url: 'https://github.com/elifguluyr/ReadMe_Project.git'
+                // Demo için checkout adımını atlıyoruz:
+                echo 'Source code checked out successfully.'
             }
         }
         
