@@ -35,5 +35,20 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock # Docker within Docker (Jenkins'in docker komutlarını kullanabilmesi için)
     restart: unless-stopped
 
+  redis:
+    image: redis:alpine
+    container_name: readme_redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: readme_rabbitmq
+    ports:
+      - "5672:5672"   # Mesaj trafiği (AMQP) portu
+      - "15672:15672" # RabbitMQ Management UI portu
+    restart: unless-stopped
+
 volumes:
   jenkins_data:
