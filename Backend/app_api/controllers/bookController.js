@@ -1,9 +1,40 @@
 const Book = require("../models/Book");
 const axios = require("axios");
+const redis = require("redis");
+
+// Redis İstemcisi Oluşturma (Docker içindeki 'redis' servisine bağlanacak)
+let redisClient;
+(async () => {
+  try {
+    redisClient = redis.createClient({ url: process.env.REDIS_URL || 'redis://redis:6379' });
+    redisClient.on("error", (error) => console.error(`[Redis] Error : ${error}`));
+    await redisClient.connect();
+    console.log("[Redis] Bağlantı başarılı!");
+  } catch (error) {
+    console.error("[Redis] Bağlantı kurulamadı, cache devre dışı kalabilir.", error);
+  }
+})();
 
 const getBooks = async (req, res) => {
   try {
+    // 1. Önce Redis'te cache var mı diye kontrol et
+    if (redisClient && redisClient.isReady) {
+      const cachedBooks = await redisClient.get("all_books");
+      if (cachedBooks) {
+        console.log("[Redis] Kitaplar cache'den çok hızlı getirildi! 🚀");
+        return res.status(200).json(JSON.parse(cachedBooks));
+      }
+    }
+
+    // 2. Cache'de yoksa Veritabanından (MongoDB) çek
+    console.log("[MongoDB] Kitaplar veritabanından çekiliyor... 🐢");
     const books = await Book.find();
+
+    // 3. Çekilen veriyi Redis'e kaydet (Örn: 3600 saniye = 1 saat boyunca cache'te kalsın)
+    if (redisClient && redisClient.isReady) {
+      await redisClient.setEx("all_books", 3600, JSON.stringify(books));
+    }
+
     res.status(200).json(books);
   } catch (error) {
     res.status(500).json({ message: "Kitaplar alınamadı", error: error.message });

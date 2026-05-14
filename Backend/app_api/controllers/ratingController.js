@@ -1,4 +1,36 @@
 const Rating = require("../models/Rating");
+const amqp = require("amqplib");
+
+// RabbitMQ Bağlantısı ve Kuyruk (Queue) Ayarları
+let channel;
+const queueName = "rating_tasks";
+
+(async () => {
+  try {
+    const connection = await amqp.connect(process.env.RABBITMQ_URL || "amqp://rabbitmq:5672");
+    channel = await connection.createChannel();
+    await channel.assertQueue(queueName, { durable: true });
+    console.log("[RabbitMQ] Bağlantı başarılı ve kuyruk hazır!");
+
+    // Bonus: Videoda sistemin çalıştığını göstermek için burada basit bir "İşçi (Worker)" çalıştırıyoruz.
+    // (Normalde bu işçi başka bir sunucuda veya ayrı bir projede olurdu)
+    channel.consume(queueName, (msg) => {
+      if (msg !== null) {
+        console.log(`\n[RabbitMQ WORKER] 📥 Yeni bir iş geldi: ${msg.content.toString()}`);
+        console.log(`[RabbitMQ WORKER] ⚙️  Kitabın yeni ortalama puanı hesaplanıyor (Ağır İşlem)...`);
+        
+        // İşlemin 2 saniye sürdüğünü simüle ediyoruz
+        setTimeout(() => {
+            console.log("[RabbitMQ WORKER] ✅ İş başarıyla tamamlandı!\n");
+            channel.ack(msg); // Mesajın işlendiğini RabbitMQ'ya bildiriyoruz
+        }, 2000); 
+      }
+    });
+
+  } catch (error) {
+    console.error("[RabbitMQ] Bağlantı hatası:", error);
+  }
+})();
 
 const addRating = async (req, res) => {
   try {
@@ -22,6 +54,13 @@ const addRating = async (req, res) => {
     });
 
     const savedRating = await newRating.save();
+
+    // RabbitMQ'ya mesaj gönder (Kullanıcı bu ağır işlemlerin bitmesini beklemez, hemen cevap alır)
+    if (channel) {
+      const msgData = JSON.stringify({ bookId, rating, userId, timestamp: new Date() });
+      channel.sendToQueue(queueName, Buffer.from(msgData), { persistent: true });
+      console.log(`\n[RabbitMQ] 🚀 Mesaj anında kuyruğa atıldı! Kullanıcı bekletilmeyecek.`);
+    }
 
     res.status(201).json(savedRating);
   } catch (error) {
