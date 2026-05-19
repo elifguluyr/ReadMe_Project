@@ -4,6 +4,8 @@ const Paylasim = mongoose.model('Paylasim');
 const redis = require('redis');
 const amqp = require('amqplib');
 
+let amqpChannel = null;
+
 // Redis Client Setup
 let redisClient;
 (async () => {
@@ -18,7 +20,7 @@ let redisClient;
 
 const clearCache = async () => {
     try {
-        if (redisClient && redisClient.isOpen) {
+        if (redisClient && redisClient.isReady) {
             await redisClient.del('posts_cache');
         }
     } catch (err) {
@@ -105,15 +107,9 @@ const begen = async (req, res) => {
         const message = { postId: paylasimId, userId: userId };
 
         try {
-            const connection = await amqp.connect(process.env.RABBITMQ_URL || 'amqp://localhost');
-            const channel = await connection.createChannel();
-            await channel.assertQueue('like_queue', { durable: true });
+            if (!amqpChannel) throw new Error("RabbitMQ channel hazır değil");
             
-            channel.sendToQueue('like_queue', Buffer.from(JSON.stringify(message)));
-            
-            setTimeout(() => {
-                connection.close();
-            }, 500);
+            amqpChannel.sendToQueue('like_queue', Buffer.from(JSON.stringify(message)));
             
             // Kullanıcıya hemen cevap dönülür (Veritabanı beklenmeden)
             return res.status(200).json({ mesaj: "Beğeni alındı" });
@@ -194,8 +190,8 @@ const paylasimlariListele = async (req, res) => {
     try {
         const cacheKey = 'posts_cache';
 
-        try {
-            if (redisClient && redisClient.isOpen) {
+        try { //redis
+            if (redisClient && redisClient.isReady) {
                 const cachedPosts = await redisClient.get(cacheKey);
                 if (cachedPosts) {
                     // Redis'te varsa hızlıca dön
@@ -216,7 +212,7 @@ const paylasimlariListele = async (req, res) => {
         }
 
         try {
-            if (redisClient && redisClient.isOpen) {
+            if (redisClient && redisClient.isReady) {
                 // Redis'e kaydet (1 saat geçerli: 3600 saniye)
                 await redisClient.setEx(cacheKey, 3600, JSON.stringify(paylasimlar));
             }
@@ -231,15 +227,25 @@ const paylasimlariListele = async (req, res) => {
     }
 };
 // Worker Setup (Controller içine gömülü)
-const startWorker = async () => {
+const initRabbitMQ = async () => {
     try {
         const connection = await amqp.connect(process.env.RABBITMQ_URL || 'amqp://localhost');
-        const channel = await connection.createChannel();
-        await channel.assertQueue('like_queue', { durable: true });
+        
+        connection.on("error", (err) => {
+            console.error("RabbitMQ Connection Error:", err);
+            amqpChannel = null;
+        });
+        connection.on("close", () => {
+            console.error("RabbitMQ Connection Closed.");
+            amqpChannel = null;
+        });
 
-        console.log("Worker: like_queue kuyruğu dinleniyor (Controller İçinden)...");
+        amqpChannel = await connection.createChannel();
+        await amqpChannel.assertQueue('like_queue', { durable: true });
 
-        channel.consume('like_queue', async (msg) => {
+        console.log("RabbitMQ: like_queue kuyruğu dinleniyor ve yayıncı hazır...");
+
+        amqpChannel.consume('like_queue', async (msg) => {
             if (msg !== null) {
                 const message = JSON.parse(msg.content.toString());
                 const { postId, userId } = message;
@@ -258,21 +264,21 @@ const startWorker = async () => {
                         }
                         await paylasim.save();
                         await clearCache(); // Cache güncelle
-                        console.log(`Worker (Controller): Beğeni işlemi başarılı. Post: ${postId}, User: ${userId}`);
+                        console.log(`Worker: Beğeni işlemi başarılı. Post: ${postId}, User: ${userId}`);
                     }
-                    channel.ack(msg);
+                    amqpChannel.ack(msg);
                 } catch (err) {
-                    console.error("Worker (Controller): MongoDB işlem hatası:", err);
-                    channel.nack(msg, false, false);
+                    console.error("Worker: MongoDB işlem hatası:", err);
+                    amqpChannel.nack(msg, false, false);
                 }
             }
         });
     } catch (err) {
-        console.error("Worker (Controller): RabbitMQ bağlantı hatası:", err);
+        console.error("RabbitMQ Başlangıç hatası (Sistem senkron devam edecek):", err);
     }
 };
 
-startWorker();
+initRabbitMQ();
 
 module.exports = { paylasimYap, yorumYap, paylasimSil, yorumSil, begen, yorumGuncelle, yorumlariListele, paylasimGetir, paylasimlariListele };
 
