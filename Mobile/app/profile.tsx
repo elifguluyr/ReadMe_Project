@@ -14,7 +14,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { userAPI } from '../services/api';
+import api, { userAPI } from '../services/api';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -112,10 +112,17 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('userToken');
-    await AsyncStorage.removeItem('userId');
-    await AsyncStorage.removeItem('userData');
-    router.replace('/login');
+    try {
+      await api.post('/api/logout'); 
+    } catch (error) {
+      console.log('Sunucuya çıkış bilgisi iletilemedi, ancak lokal çıkış yapılıyor:', error);
+    } finally {
+      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('userId');
+      await AsyncStorage.removeItem('userData');
+      
+      router.replace('/login');
+    }
   };
 
   const handleDeleteAccount = async () => {

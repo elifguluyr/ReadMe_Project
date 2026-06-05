@@ -40,6 +40,7 @@ const getBooks = async (req, res) => {
     res.status(500).json({ message: "Kitaplar alınamadı", error: error.message });
   }
 };
+
 const searchBooks = async (req, res) => {
     const { q } = req.query;
 
@@ -47,11 +48,23 @@ const searchBooks = async (req, res) => {
         return res.status(400).json({ message: "Lütfen aranacak bir kitap ismi girin." });
     }
 
+    const cacheKey = `search_books_${q.trim().toLowerCase()}`;
+
     try {
+        // 1. ÖNCE REDIS'E SOR (CACHE HIT KONTROLÜ)
+        if (redisClient && redisClient.isReady) {
+            const cachedResults = await redisClient.get(cacheKey);
+            if (cachedResults) {
+                console.log(`[Redis] "${q}" araması cache'den çok hızlı getirildi! 🚀`);
+                return res.status(200).json(JSON.parse(cachedResults));
+            }
+        }
+
+        // 2. REDIS'TE YOKSA GOOGLE API'YE GİT (CACHE MISS)
         const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
         const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=15${apiKey ? `&key=${apiKey}` : ""}`;
         
-        console.log(`Kitap araması yapılıyor: ${q}`);
+        console.log(`[API] "${q}" araması Google Books API'den çekiliyor... 🐢`);
         const response = await axios.get(url);
 
         if (!response.data || !response.data.items) {
@@ -71,6 +84,12 @@ const searchBooks = async (req, res) => {
                 ratingsCount: volumeInfo.ratingsCount || 0
             };
         });
+
+        // 3. ÇEKİLEN VERİYİ REDIS'E KAYDET (Örn: 3600 saniye = 1 saat boyunca cache'te kalsın)
+        if (redisClient && redisClient.isReady) {
+            await redisClient.setEx(cacheKey, 3600, JSON.stringify(results));
+            console.log(`[Redis] "${q}" aramasının sonuçları başarıyla cache'e kaydedildi. 💾`);
+        }
 
         res.status(200).json(results);
     } catch (error) {

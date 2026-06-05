@@ -7,6 +7,7 @@ var cors = require('cors');
 require('./app_api/models/db');
 require('./app_api/models/users');
 require('./app_api/config/passport');
+require('./emailWorker');
 
 
 var indexRouter = require('./routes/index');
