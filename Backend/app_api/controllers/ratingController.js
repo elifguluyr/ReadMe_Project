@@ -1,7 +1,7 @@
 const Rating = require("../models/Rating");
 const amqp = require("amqplib");
 
-// RabbitMQ Bağlantısı ve Kuyruk (Queue) Ayarları
+
 let channel;
 const queueName = "rating_tasks";
 
@@ -12,17 +12,16 @@ const queueName = "rating_tasks";
     await channel.assertQueue(queueName, { durable: true });
     console.log("[RabbitMQ] Bağlantı başarılı ve kuyruk hazır!");
 
-    // Bonus: Videoda sistemin çalıştığını göstermek için burada basit bir "İşçi (Worker)" çalıştırıyoruz.
-    // (Normalde bu işçi başka bir sunucuda veya ayrı bir projede olurdu)
+    
     channel.consume(queueName, (msg) => {
       if (msg !== null) {
         console.log(`\n[RabbitMQ WORKER] 📥 Yeni bir iş geldi: ${msg.content.toString()}`);
         console.log(`[RabbitMQ WORKER] ⚙️  Kitabın yeni ortalama puanı hesaplanıyor (Ağır İşlem)...`);
         
-        // İşlemin 2 saniye sürdüğünü simüle ediyoruz
+        
         setTimeout(() => {
             console.log("[RabbitMQ WORKER] ✅ İş başarıyla tamamlandı!\n");
-            channel.ack(msg); // Mesajın işlendiğini RabbitMQ'ya bildiriyoruz
+            channel.ack(msg); 
         }, 2000); 
       }
     });
