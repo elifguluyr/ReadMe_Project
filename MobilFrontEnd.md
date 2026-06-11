@@ -7,7 +7,7 @@ Bu dokümanda, mobil uygulamanın kullanıcı arayüzü (UI) ve kullanıcı dene
 ## Grup Üyelerinin Mobil Frontend Görevleri
 
 1. [Efsa Nur Bölükbaş'ın Mobil Frontend Görevleri](Efsa-Nur-Bolukbas/Efsa-Nur-Bolukbas-Mobile-Frontend-Gorevleri.md)
-2. [Grup Üyesi 2'nin Mobil Frontend Görevleri](Grup-Uyesi-2/Grup-Uyesi-2-Mobil-Frontend-Gorevleri.md)
+2. [Verda-Er'in Mobil Frontend Görevleri](Verda-Er/Verda-Er-Mobile-Frontend-Gorevleri.md)
 3. [Grup Üyesi 3'ün Mobil Frontend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Mobil-Frontend-Gorevleri.md)
 4. [Grup Üyesi 4'ün Mobil Frontend Görevleri](Grup-Uyesi-4/Grup-Uyesi-4-Mobil-Frontend-Gorevleri.md)
 5. [Grup Üyesi 5'in Mobil Frontend Görevleri](Grup-Uyesi-5/Grup-Uyesi-5-Mobil-Frontend-Gorevleri.md)
